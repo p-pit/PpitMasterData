@@ -1,0 +1,103 @@
+<?php
+$spa = $context->isSpaMode();
+$anchorStyle = ($spa) ? $context->getAnchorStyle() : 'classic';
+?>
+
+				<table class="table table-striped ppit_index">
+					<tr>
+						<th>&nbsp;</th>
+						<th><strong>
+							<?php echo $this->partial('/partials/anchor-widget.phtml', array(
+									'text' => $this->translate('Type', 'ppit-core', $context->getLocale()),
+									'id' => 'type-anchor',
+									'anchorStyle' => $context->getAnchorStyle(),
+									'spa' => $spa,
+							)) ?>
+						</strong></th>
+						<th><strong>
+							<?php echo $this->partial('/partials/anchor-widget.phtml', array(
+									'text' => $this->translate('Name', 'ppit-core', $context->getLocale()),
+									'id' => 'identifier-anchor',
+									'anchorStyle' => $context->getAnchorStyle(),
+									'spa' => $spa,
+							)) ?>
+						</strong></th>
+					</tr>
+
+					<tr>
+						<td colspan="3">
+<!-- Add -->
+							<?php echo $this->partial('/partials/anchor-widget.phtml', array(
+									'glyphicon' => 'glyphicon-plus',
+									'title' => $this->translate('Add', 'ppit-core', $context->getLocale()),
+									'id' => 'add-anchor',
+									'anchorStyle' => $anchorStyle,
+									'spa' => $spa,
+									'showForm' => true,
+							)) ?>
+						</td>
+					</tr>
+
+<?php foreach ($orgUnits as $orgUnit) : ?>
+					<tr<?php if (!$orgUnit->is_open) echo ' class="inactive"'?>>
+
+<!-- detail -->
+						<td>
+							<?php echo $this->partial('/partials/anchor-widget.phtml', array(
+									'glyphicon' => 'glyphicon-zoom-in',
+									'title' => $this->translate('Detail', 'ppit-core', $context->getLocale()),
+									'id' => 'detail-anchor-'.$orgUnit->id,
+									'anchorStyle' => $context->getAnchorStyle(),
+									'spa' => $spa,
+									'showForm' => true,
+							)) ?>
+						</td>
+
+						<td><?php echo $this->translate($orgUnit->type, 'ppit-master-data', $context->getLocale()) ?></td>
+						<td><?php echo $orgUnit->identifier ?> - <?php echo $orgUnit->caption ?></td>
+						
+					</tr>
+<?php endforeach; ?>
+				</table>
+		
+<script id='org_unit_list_script'>
+
+// Sort on type
+$('#type-anchor').click(function () {
+	reload(
+		'<?php echo $this->url('orgUnit/list').'?major=type'.(($major == 'type' && $dir =='ASC') ? '&dir=DESC' : '&dir=ASC') ?>',
+		'org_unit_list_script',
+		'org_unit_list'
+	);
+} );
+
+//Sort on name
+$('#name-anchor').click(function () {
+	reload(
+		'<?php echo $this->url('orgUnit/list').'?major=name'.(($major == 'name' && $dir =='ASC') ? '&dir=DESC' : '&dir=ASC') ?>',
+		'org_unit_list_script',
+		'org_unit_list'
+	);
+} );
+
+// Add
+<?php echo $this->partial('/partials/show-form-script', array(
+		'id' => 'add-anchor',
+		'route' => $this->url('orgUnit/update'),
+		'script' =>'org_unit_update_script',
+		'spa' => $spa,
+)) ?>
+
+<?php foreach ($orgUnits as $orgUnit) : ?>
+
+// Update
+	<?php echo $this->partial('/partials/show-form-script', array(
+			'id' => 'detail-anchor-'.$orgUnit->id,
+			'route' => $this->url('orgUnit/update', array('parent_id' => 0, 'id' => $orgUnit->id)),
+			'script' =>'org_unit_update_script',
+			'spa' => $spa,
+	)) ?>
+
+<?php endforeach;?>
+
+</script>

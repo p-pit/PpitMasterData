@@ -1,0 +1,137 @@
+
+<?php
+	$title = $this->translate('Add Option', 'ppit-order', $context->getLocale());
+    echo $this->partial('/partials/menu');
+?>
+
+<?php
+$this->headTitle($title);
+?>
+<div class="row">
+    <div class="col-md-6">
+		<div class="panel panel-default">
+            <div class="panel-heading">
+				<strong><?php echo $this->translate($title);?></strong>
+            </div>
+           	<div class="panel-body">
+           	
+<h3 align="center"><?php echo $this->translate('New Option', 'ppit-order', $context->getLocale());?></h3>
+
+				<!-- Form opening tag -->
+	<form action="<?php echo $this->url('option/add') ?>" method="post" name="addOption" class="form-horizontal" enctype="form-data" id="addOption" onSubmit="return checkForm()">
+	
+					<div class="col-sm-12">&nbsp;</div>
+
+				
+				
+<!--  CSRF -->
+<?php $element = $csrfForm->get('option_add_csrf') ?>
+				    <div class="form-group">
+						<?php echo $this->formElement($element) ?>
+<?php if ($this->formElementErrors($element)) : ?>
+						<div class="col-sm-12"><p class="help-block"><?php echo $this->translate('The form has expired, please input again', 'ppit-core', $context->getLocale()) ?></p></div>
+<?php endif;?>
+					</div>
+
+<!-- caption -->
+				    <div class="form-group" id="input_caption_group">
+						<label class="col-sm-6 control-label">* <?php echo $this->translate('Caption', 'ppit-expense', $context->getLocale()) ?></label>
+						<div class="col-sm-6">
+							<input  name="caption" id="caption" class="form-control" >
+						</div>
+						<div class="col-sm-12"><p class="help-block" id="input_caption_error"></p></div>
+					</div>
+
+
+	
+<!-- default_quantity -->
+				    <div class="form-group" id="input_default_quantity_group">
+						<label class="col-sm-6 control-label">* <?php echo $this->translate('Default quantity', 'ppit-expense', $context->getLocale()) ?></label>
+						<div class="col-sm-6">
+						<!--	<input "number" name="input_default_quantity" id="input_default_quantity" class="form-control" value="">
+							<input type="hidden" name="default_quantity" id="default_quantity"> 
+						  -->		<input type="number" name="default_quantity" id="default_quantity" min="0" max="100" step="1" value="">
+						</div>
+						<div class="col-sm-12"><p class="help-block" id="input_default_quantity_error"></p></div>
+					</div>
+
+
+				
+<!-- is_on_sale -->
+					<div class="form-group">
+						<label class="col-sm-5 control-label"><?php echo $this->translate('Is on Sale', 'ppit-core', $context->getLocale()) ?></label>
+						<div class="col-sm-7">
+							<input type="checkbox" name="is_on_sale" value="1" class="form-control" >
+							
+						</div>
+					</div>
+					
+<!-- Submit button -->
+				    <div class="form-group">
+						<div class="col-sm-5">&nbsp;</div>
+						<div class="col-sm-7">
+							<input name="submit" type="submit" id="submitbutton" class="btn btn-primary" value="<?php echo $this->translate('Submit', 'ppit-core', $context->getLocale()) ?>">
+							&nbsp;&nbsp;
+							<a href="<?php echo $this->url('option') ?>"><?php echo $this->translate('Cancel', 'ppit-core', $context->getLocale()) ?></a>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Load the common form javascript functions -->
+<?php echo $this->partial('/partials/common-form-js.phtml'); ?>
+
+<script>
+
+// The elements are checked last to first so the focus is positionned on the first element on error
+function checkForm() 
+{
+
+
+	// caption min
+	if (document.getElementById("caption").value == "") {
+		renderElement("caption", "<?php echo $this->translate('A value should be selected', 'ppit-core', $context->getLocale()) ?>");
+		validity = false;
+	}
+    else {
+		renderElement("caption", null);
+	}
+
+	// caption max
+	if (document.getElementById("caption").value > 255) {
+		renderElement("caption", "<?php echo $this->translate('A value < 255 should be selected', 'ppit-core', $context->getLocale()) ?>");
+		validity = false;
+	}
+    else {
+		renderElement("caption", null);
+	}
+	
+
+	
+	var validity = true;	
+	// amounts
+	var includingVatAmount, sum = 0;
+	var number, amountValidity = true, error;
+	
+	number = document.getElementById("input_default_quantity").value;
+	error = checkNumber(number, 0, 999999);
+	if (error) {
+		renderElement("input_default_quantity", error);
+		validity = amountValidity = false;
+	}
+	else { 
+		renderElement("input_default_quantity", null);
+		number = getNumber(number, 2);
+		document.getElementById("default_quantity").value = number;
+		
+}
+
+	
+
+	return validity;
+}
+</script>
+  

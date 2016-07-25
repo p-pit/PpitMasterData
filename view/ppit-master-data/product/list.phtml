@@ -1,0 +1,114 @@
+<table class="table table-striped ppit_index">
+	<tr>
+		<th colspan="3">&nbsp;</th>
+
+<?php if ($context->getInstance()->specifications['ppitMasterData']['product/list']['brand']) : ?>
+		<th align="center">
+			<button type="button" class="btn btn-default btn-xs ppit-sort-anchor" id="brand-anchor">
+				<span><?php echo $this->translate('Brand', 'ppit-master-data', $context->getLocale()) ?></span>
+	<?php if ($major == 'brand') : ?>
+				<span class="glyphicon glyphicon-triangle-<?php echo ($dir == 'ASC') ? 'top' : 'bottom' ?>"></span>
+	<?php endif ?>
+			</button>
+		</th>
+<?php endif;?>
+
+<?php if ($context->getInstance()->specifications['ppitMasterData']['product/list']['reference']) : ?>
+		<th align="center">
+			<button type="button" class="btn btn-default btn-xs ppit-sort-anchor" id="reference-anchor">
+				<span><?php echo $this->translate('Reference', 'ppit-master-date', $context->getLocale()) ?></span>
+	<?php if ($major == 'reference') : ?>
+				<span class="glyphicon glyphicon-triangle-<?php echo ($dir == 'ASC') ? 'top' : 'bottom' ?>"></span>
+	<?php endif ?>
+			</button>
+		</th>
+<?php endif;?>
+
+<?php if ($context->getInstance()->specifications['ppitMasterData']['product/list']['caption']) : ?>
+		<th align="center">
+			<button type="button" class="btn btn-default btn-xs ppit-sort-anchor" id="caption-anchor">
+				<span><?php echo $this->translate('Caption', 'ppit-core', $context->getLocale()) ?></span>
+	<?php if ($major == 'caption') : ?>
+				<span class="glyphicon glyphicon-triangle-<?php echo ($dir == 'ASC') ? 'top' : 'bottom' ?>"></span>
+	<?php endif ?>
+			</button>
+		</th>
+<?php endif;?>
+
+<?php foreach ($context->getInstance()->specifications['ppitMasterData']['product/list']['properties'] as $propertyId => $property) : ?>
+		<th align="center">
+			<button type="button" class="btn btn-default btn-xs ppit-sort-anchor" id="<?php echo $propertyId ?>-anchor">
+				<span><?php echo $context->getInstance()->specifications['ppitMasterData']['properties'][$propertyId]['labels'][$context->getLocale()] ?></span>
+	<?php if ($major == '<?php echo $propertyId ?>') : ?>
+				<span class="glyphicon glyphicon-triangle-<?php echo ($dir == 'ASC') ? 'top' : 'bottom' ?>"></span>
+	<?php endif ?>
+			</button>
+		</th>
+<?php endforeach;?>
+
+	</tr>
+		
+	<tr>
+		<td>
+			<button type="button" class="btn btn-default btn-xs index-btn product-detail-anchor" title="<?php echo $this->translate('Detail', 'ppit-core', $context->getLocale())?>" id="product-detail-anchor_0">
+				<span class="glyphicon glyphicon-plus" id="add-glyphicon"></span>
+			</button>
+		</td>
+	</tr>
+	
+<?php foreach ($products as $product) : ?>
+	<?php if ($context->isAllowed('product/detail')) : ?>
+	
+	<tr class="product">
+		<td >
+			<button type="button" class="btn btn-default btn-xs index-btn product-detail-anchor" title="<?php echo $this->translate('Detail', 'ppit-core', $context->getLocale())?>" id="product-detail-anchor_<?php echo $product->id ?>">
+				<span class="glyphicon glyphicon-zoom-in" id="<?php echo $product->id ?>-glyphicon"></span>
+			</button>
+		</td>
+
+		<td >
+			<button type="button" class="btn btn-default btn-xs index-btn product-detail-anchor" title="<?php echo $this->translate('Detail', 'ppit-core', $context->getLocale())?>" id="product-detail-anchor_<?php echo $product->id ?>">
+				<span class="glyphicon glyphicon-zoom-in" id="<?php echo $product->id ?>-glyphicon"></span>
+			</button>
+		</td>
+
+		<td >
+			<button type="button" class="btn btn-default btn-xs index-btn product-detail-anchor" title="<?php echo $this->translate('Detail', 'ppit-core', $context->getLocale())?>" id="product-detail-anchor_<?php echo $product->id ?>">
+				<span class="glyphicon glyphicon-zoom-in" id="<?php echo $product->id ?>-glyphicon"></span>
+			</button>
+		</td>
+
+<?php if ($context->getInstance()->specifications['ppitMasterData']['product/list']['brand']) : ?>
+		<td><?php echo $product->brand ?></td>
+<?php endif;?>
+
+<?php if ($context->getInstance()->specifications['ppitMasterData']['product/list']['reference']) : ?>
+		<td><?php echo $product->reference ?></td>
+<?php endif;?>
+
+<?php if ($context->getInstance()->specifications['ppitMasterData']['product/list']['caption']) : ?>
+		<td><?php echo $product->caption ?></td>
+<?php endif;?>
+
+<?php foreach ($context->getInstance()->specifications['ppitMasterData']['product/list']['properties'] as $propertyId => $params) : ?>
+	<?php $property = $context->getInstance()->specifications['ppitMasterData']['properties'][$propertyId] ?>
+	
+	<?php if ($property['type'] == 'number') : ?>
+		<td style="text-align: right"><?php echo $context->formatFloat($product->properties[$propertyId], 2) ?></td>
+	
+	<?php elseif ($property['type'] == 'date') : ?>
+		<td><?php echo $context->decodeDate($product->properties[$propertyId]) ?></td>
+	
+	<?php else : ?>
+		<td><?php echo $product->properties[$propertyId] ?></td>
+
+	<?php endif;?>
+
+<?php endforeach;?>
+
+	</tr>
+	
+	<?php endif;?>
+<?php endforeach; ?>
+
+</table>

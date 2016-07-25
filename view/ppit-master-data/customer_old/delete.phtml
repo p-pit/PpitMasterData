@@ -1,0 +1,26 @@
+<?php
+    echo $this->partial('/partials/menu');
+?>
+<?php
+$this->headTitle($title);
+?>
+<div class="row">
+    <div class="col-md-6">
+		<div class="panel panel-default">
+            <div class="panel-heading">
+				<strong><?php echo $this->translate($title);?></strong>
+            </div>
+           	<div class="panel-body">
+<h3 align="center"><?php echo $this->translate('Delete a customer');?></h3>
+<?php
+$url = $this->url('customer/delete', array('id' => $this->id));
+?>
+<form action="<?php echo $url; ?>" method="post">
+<div>
+    <input type="hidden" name="id" value="<?php echo (int) $this->id; ?>" />
+    <input type="submit" class="btn btn-primary" name="del" value="<?php echo $this->translate('Confirm') ?>" />
+    &nbsp;&nbsp;
+	<a href="<?php echo $this->url('customer');?>"><?php echo $this->translate('Cancel') ?></a>
+</div>
+</form>
+

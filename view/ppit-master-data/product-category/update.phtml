@@ -1,0 +1,121 @@
+<?php
+$spa = $context->isSpaMode();
+$anchorStyle = ($spa) ? $context->getAnchorStyle() : 'classic';
+$current = 'product';
+?>
+
+<!-- Display header on MPA mode -->
+<?php if (!$spa) : ?>
+	<?php 
+		$this->current = 'product';
+		echo $this->partial('/partials/menu'); 
+	?>
+<div class="row">
+    <div class="col-md-6 col-md-offset-3">
+<?php endif;?>
+
+		<div class="panel panel-default">
+            <div class="panel-heading">
+				<?php echo $this->translate(($id) ? 'Update a product category' : 'Add a product category', 'ppit-master-data', $context->getLocale());?>
+ 				<div class="btn-group pull-right">
+					<?php echo $this->partial('/partials/anchor-widget.phtml', array(
+							'glyphicon' => 'glyphicon-remove',
+							'title' => $this->translate('Return to list', 'ppit-core', $context->getLocale()),
+							'id' => 'remove-anchor',
+							'anchorStyle' => $anchorStyle,
+							'spa' => $spa,
+					)) ?>
+				</div>
+			</div>
+            <div class="panel-body">
+
+<!-- Form header -->
+<?php echo $this->partial('/partials/form-header', array(
+			'id' => $id,
+			'update_time' => $productCategory->update_time,
+			'message' => $message,
+			'error' => $error,
+			'csrfForm' => $csrfForm,
+			'context' => $context,
+)) ?>
+
+<?php if ($message == 'OK') $isDisabled = true; else $isDisabled = false; ?>
+            					
+<!-- Caption -->
+<?php
+	echo $this->partial('/partials/input-widget.phtml', array(
+		'property' => 'caption',
+		'label' => '* '.$this->translate('Caption', 'ppit-core', $context->getLocale()),
+		'value' => $productCategory->caption,
+		'isMandatory' => true,
+		'maxLength' => 255,
+		'context' => $context,
+		'isDisabled' => $isDisabled,
+)); ?>
+
+<!-- Form footer -->
+<?php echo $this->partial('/partials/form-footer') ?>
+
+			</div>
+		</div>
+<?php if (!$spa) : ?>
+	</div>
+</div>
+<?php endif;?>
+
+<!-- Load the common form javascript functions -->
+<?php echo $this->partial('/partials/common-form-js.phtml'); ?>
+
+<script id="product_category_update_script">
+
+// Close form
+<?php echo $this->partial('/partials/form-return-script', array(
+		'id' => 'remove-anchor',
+		'route' => $this->url('productCategory/index'),
+		'spa' => $spa,
+)) ?>
+
+<?php if ($message == 'OK') : ?>
+
+<?php echo $this->partial('/partials/form-return-script', array(
+		'id' => 'foot-return-anchor',
+		'route' => $this->url('productCategory/index'),
+		'spa' => $spa,
+)) ?>
+
+<?php else : ?>
+
+<?php echo $this->partial('/partials/form-return-script', array(
+		'id' => 'cancel-anchor',
+		'route' => $this->url('productCategory/index'),
+		'spa' => $spa,
+)) ?>
+
+// Submit
+<?php
+echo $this->partial('/partials/form-button-script', array(
+		'context' => $context,
+		'id' => 'submit-button',
+//		'checkFunction' => 'checkForm',
+		'formRoute' => $this->url('productCategory/update', array('id' => $id)),
+		'formScript' =>'product_category_update_script',
+		'properties' => array('caption' => 'input', 'update_time' => 'hidden'),
+		'mainRoute' => $this->url('productCategory/index'),
+		'mainScript' =>'product_category_script',
+		'hideForm' => false,
+)) ?>
+
+<?php endif;?>
+/*
+// The elements are checked last to first so the focus is positionned on the first element on error
+function checkForm() 
+{
+	var validity = true;	
+
+	// Caption
+	if (!check_caption()) validity = false;
+
+	return validity;
+}*/
+</script>
+  

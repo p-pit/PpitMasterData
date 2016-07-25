@@ -1,0 +1,107 @@
+<?php
+$spa = $context->isSpaMode();
+$anchorStyle = ($spa) ? $context->getAnchorStyle() : 'classic';
+?>
+
+<h4><?php echo $this->translate('Access control list', 'ppit-master-data', $context->getLocale()) ?></h4>
+
+				<table class="table table-striped ppit_index">
+					<tr>
+						<th>&nbsp;</th>
+						<th><strong>
+							<?php echo $this->partial('/partials/anchor-widget.phtml', array(
+									'text' => $this->translate('Name', 'ppit-contact', $context->getLocale()),
+									'id' => 'n-fn-anchor',
+									'anchorStyle' => $context->getAnchorStyle(),
+									'spa' => $spa,
+							)) ?>
+						</strong></th>
+						<th><strong>
+							<?php echo $this->partial('/partials/anchor-widget.phtml', array(
+									'text' => $this->translate('Effective date', 'ppit-master-data', $context->getLocale()),
+									'id' => 'effect-anchor',
+									'anchorStyle' => $context->getAnchorStyle(),
+									'spa' => $spa,
+							)) ?>
+						</strong></th>
+					</tr>
+
+					<tr>
+						<td colspan="3">
+<!-- Add -->
+							<?php echo $this->partial('/partials/anchor-widget.phtml', array(
+									'glyphicon' => 'glyphicon-plus',
+									'title' => $this->translate('Add', 'ppit-core', $context->getLocale()),
+									'id' => 'org-unit-contact-add-anchor',
+									'anchorStyle' => $anchorStyle,
+									'spa' => $spa,
+									'showForm' => true,
+							)) ?>
+						</td>
+					</tr>
+
+<?php foreach ($orgUnitContacts as $orgUnitContact) : ?>
+					<tr>
+
+<!-- delete -->
+						<td>
+							<?php echo $this->partial('/partials/anchor-widget.phtml', array(
+									'glyphicon' => 'glyphicon-trash',
+									'title' => $this->translate('Detail', 'ppit-core', $context->getLocale()),
+									'id' => 'org-unit-contact-delete-anchor-'.$orgUnitContact->id,
+									'anchorStyle' => $context->getAnchorStyle(),
+									'spa' => $spa,
+									'showForm' => true,
+							)) ?>
+						</td>
+
+						<td><?php echo $orgUnitContact->n_fn ?></td>
+						<td><?php echo $context->decodeDate($orgUnitContact->effect) ?></td>
+
+					</tr>
+<?php endforeach; ?>
+				</table>
+		
+<script id='org_unit_contact_list_script'>
+
+// Sort on n_fn
+$('#n-fn-anchor').click(function () {
+	reload(
+		'<?php echo $this->url('orgUnitContact/list', array('org_unit_id' => $orgUnit->id)).'?major=n_fn'.(($major == 'n_fn' && $dir =='ASC') ? '&dir=DESC' : '&dir=ASC') ?>',
+		'org_unit_contact_list_script',
+		'org_unit_contact_list'
+	);
+} );
+
+// Sort on effective date
+$('#effect-anchor').click(function () {
+	reload(
+		'<?php echo $this->url('orgUnitContact/list', array('org_unit_id' => $orgUnit->id)).'?major=effect'.(($major == 'effect' && $dir =='ASC') ? '&dir=DESC' : '&dir=ASC') ?>',
+		'org_unit_contact_list_script',
+		'org_unit_contact_list'
+	);
+} );
+
+// Add
+$('#org-unit-contact-add-anchor').click(function () {
+	reload(
+		'<?php echo $this->url('orgUnitContact/add', array('org_unit_id' => $orgUnit->id)) ?>',
+		'org_unit_contact_add_script',
+		'org_unit_contact_list'
+	);
+} );
+
+<?php foreach ($orgUnitContacts as $orgUnitContact) : ?>
+	
+	// Delete
+	$('#org-unit-contact-delete-anchor-<?php echo $orgUnitContact->id ?>').click(function () {
+		reload(
+			'<?php echo $this->url('orgUnitContact/delete', array('id' => $orgUnitContact->id)) ?>',
+			'org_unit_contact_delete_script',
+			'org_unit_contact_list'
+		);
+	} );
+
+<?php endforeach;?>
+
+</script>

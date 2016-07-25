@@ -1,0 +1,116 @@
+<?php
+$spa = $context->isSpaMode();
+$anchorStyle = ($spa) ? $context->getAnchorStyle() : 'classic';
+?>
+
+				<table class="table table-striped ppit_index">
+					<tr>
+						<th>&nbsp;</th>
+						<th><strong>
+							<?php echo $this->partial('/partials/anchor-widget.phtml', array(
+									'text' => $this->translate('Business place', 'ppit-master-data', $context->getLocale()),
+									'id' => 'identifier-anchor',
+									'anchorStyle' => $context->getAnchorStyle(),
+									'spa' => $spa,
+							)) ?>
+						</strong></th>
+						<th><strong>
+							<?php echo $this->partial('/partials/anchor-widget.phtml', array(
+									'text' => $this->translate('Name', 'ppit-core', $context->getLocale()),
+									'id' => 'name-anchor',
+									'anchorStyle' => $context->getAnchorStyle(),
+									'spa' => $spa,
+							)) ?>
+						</strong></th>
+						<th><?php echo $this->translate('Reception')?>
+						<th><?php echo $this->translate('Delivery')?>
+					</tr>
+
+					<tr>
+						<td colspan="3">
+<!-- Add -->
+							<?php echo $this->partial('/partials/anchor-widget.phtml', array(
+									'glyphicon' => 'glyphicon-plus',
+									'title' => $this->translate('Add', 'ppit-core', $context->getLocale()),
+									'id' => 'add-anchor',
+									'anchorStyle' => $anchorStyle,
+									'spa' => $spa,
+									'showForm' => true,
+							)) ?>
+						</td>
+					</tr>
+
+<?php foreach ($places as $place) : ?>
+					<tr<?php if (!$place->is_open) echo ' class="inactive"'?>>
+
+<!-- detail -->
+						<td>
+							<?php echo $this->partial('/partials/anchor-widget.phtml', array(
+									'glyphicon' => 'glyphicon-zoom-in',
+									'title' => $this->translate('Detail', 'ppit-core', $context->getLocale()),
+									'id' => 'detail-anchor-'.$place->id,
+									'anchorStyle' => $context->getAnchorStyle(),
+									'spa' => $spa,
+									'showForm' => true,
+							)) ?>
+						</td>
+
+						<td><?php echo $place->identifier ?></td>
+						<td><?php echo $place->name ?></td>
+						<td>
+							<?php echo $place->reception_n_fn ?><br>
+							<?php if ($place->reception_email) echo '<a href="mailto:'.$place->reception_email.'">'.$place->reception_email.'</a><br>' ?>
+							<?php if ($place->reception_tel_work) echo '<a href="tel:'.$place->reception_tel_work.'">'.$place->reception_tel_work.'</a><br>' ?>
+							<?php if ($place->reception_tel_cell) echo '<a href="tel:'.$place->reception_tel_cell.'">'.$place->reception_tel_cell.'</a><br>' ?>
+						</td>
+						<td>
+							<?php echo $place->delivery_n_fn ?><br>
+							<?php if ($place->delivery_email) echo '<a href="mailto:'.$place->delivery_email.'">'.$place->delivery_email.'</a><br>' ?>
+							<?php if ($place->delivery_tel_work) echo '<a href="tel:'.$place->delivery_tel_work.'">'.$place->delivery_tel_work.'</a><br>' ?>
+							<?php if ($place->delivery_tel_cell) echo '<a href="tel:'.$place->delivery_tel_cell.'">'.$place->delivery_tel_cell.'</a><br>' ?>
+						</td>
+					</tr>
+<?php endforeach; ?>
+				</table>
+		
+<script id='place_list_script'>
+
+// Sort on identifier
+<?php echo $this->partial('/partials/show-main-script', array(
+		'id' => 'identifier-anchor',
+		'route' => $this->url('place/list').'?major=identifier'.(($major == 'identifier' && $dir =='ASC') ? '&dir=DESC' : '&dir=ASC'),
+		'script' =>'place_list_script',
+		'hideForm' => true,
+		'spa' => $spa,
+)) ?>
+
+// Sort on name
+<?php echo $this->partial('/partials/show-main-script', array(
+		'id' => 'name-anchor',
+		'route' => $this->url('place/list').'?major=name'.(($major == 'name' && $dir =='ASC') ? '&dir=DESC' : '&dir=ASC'),
+		'script' =>'place_list_script',
+		'hideForm' => true,
+		'spa' => $spa,
+)) ?>
+
+// Add
+<?php echo $this->partial('/partials/show-form-script', array(
+		'id' => 'add-anchor',
+		'route' => $this->url('place/update'),
+		'script' =>'place_update_script',
+		'spa' => $spa,
+)) ?>
+
+<?php foreach ($places as $place) : ?>
+
+// Update
+	<?php echo $this->partial('/partials/show-form-script', array(
+			'id' => 'detail-anchor-'.$place->id,
+			'route' => $this->url('place/update', array('id' => $place->id)),
+			'script' =>'place_update_script',
+			'spa' => $spa,
+	)) ?>
+
+<?php endforeach;?>
+
+</script>

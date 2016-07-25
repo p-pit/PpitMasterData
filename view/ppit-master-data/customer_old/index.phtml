@@ -1,0 +1,38 @@
+<?php
+    echo $this->partial('/partials/menu');
+?>
+<?php $this->headTitle($title); ?>
+<div class="row">
+    <div class="col-md-4 col-md-offset-4">
+		<div class="panel panel-default">
+            <div class="panel-heading">
+				<strong><?php echo $this->translate('Customers');?></strong>
+            </div>
+           	<div class="panel-body">
+<table class="table table-condensed">
+	<tr class="<?php echo $this->cycle(array("even", "odd"))->next();?>">
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+		<td align="center"><strong><a href="<?php echo $this->url('customer') ?>
+											?major=name
+											<?php if ($major == 'name' && $dir =='ASC') echo '&dir=DESC'; else echo '&dir=ASC' ?>">
+			<?php echo $this->translate('Name');?></strong></td>
+	</tr>
+	<tr>
+		<td colspan="5"><a href="<?php echo $this->url('customer/add');?>"><img height="12" src="<?php echo $this->basePath('images/plus.png') ?>" title="<?php echo $this->translate('Add') ?>" /></a></td>
+	</tr>
+<?php foreach ($customers as $customer) : ?>
+	<tr class="<?php echo $this->cycle(array("even", "odd"))->next();?>">
+		<td><a href="<?php echo $this->url('customer/update', array('id' => $customer->id));?>"><img height="12" src="<?php echo $this->basePath('images/edit_2.png') ?>" title="<?php echo $this->translate('Update') ?>" /></a></td>
+		<td><a href="<?php echo $this->url('customer/delete', array('id' => $customer->id));?>"><img height="12" src="<?php echo $this->basePath('images/eraser.png') ?>" title="<?php echo $this->translate('Update') ?>" /></a></td>
+		<td><a href="<?php echo $this->url('bill/index', array('id' => $customer->id));?>"><img height="12" src="<?php echo $this->basePath('images/print.png') ?>" title="<?php echo $this->translate('Bill') ?>" /></a></td>
+		<td align="center"><?php echo $customer->name ?></td>
+	</tr>
+<?php endforeach; ?>
+</table>
+<?php echo $this->paginationControl($this->customers, 'Sliding', 'partials/pagination.phtml', (array('route' => 'customer', 'major' => $major, 'dir' => $dir))); ?>
+			</div>
+		</div>
+	</div>
+</div>

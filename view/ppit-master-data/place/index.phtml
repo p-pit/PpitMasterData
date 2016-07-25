@@ -1,0 +1,94 @@
+<?php
+$spa = $context->isSpaMode();
+$anchorStyle = ($spa) ? $context->getAnchorStyle() : 'classic';
+$current = 'orgUnit';
+?>
+
+<!-- Display header on MPA mode -->
+<?php if (!$spa) : ?>
+	<?php 
+		$this->current = 'admin';
+		echo $this->partial('/partials/menu'); 
+	?>
+<div class="row">
+    <div class="col-md-6 col-md-offset-3">
+<?php endif;?>
+
+		<div class="panel panel-default">
+            <div class="panel-heading">
+				<?php echo $this->translate('Places of business', 'ppit-master-data', $context->getLocale()) ?>
+            </div>
+		    <div class="panel-body">
+				<table class="table-condensed">
+					<tr>
+						<td colspan="2">
+<!-- Go to organizational units -->
+							<?php echo $this->partial('/partials/anchor-widget.phtml', array(
+									'text' => $this->translate('Organization', 'ppit-master-data', $context->getLocale()),
+									'id' => 'org-unit-anchor',
+									'anchorStyle' => $anchorStyle,
+									'spa' => $spa,
+							)) ?>
+			    		</td>
+			    	</tr>
+			    </table>
+
+		    	<div class="row">
+
+<!-- Filter on name -->
+				    <div class="col-md-6">
+						<div class="form-group has-feedback">
+							<label class="control-label" for="place_name"><?php echo $this->translate('Name contains', 'ppit-master-data', $context->getLocale()) ?></label>
+							<input type="text" class="form-control" id="place_name"/>
+							<span class="glyphicon glyphicon-search form-control-feedback"></span>
+						</div>
+						
+					</div>
+				</div>
+				<div id="place_list"></div>
+			</div>
+		</div>
+<?php if (!$spa) : ?>
+	</div>
+</div>
+<?php endif;?>
+
+<script id="place_index_script">
+
+//Go to places of business
+<?php echo $this->partial('/partials/show-main-script', array(
+		'id' => 'org-unit-anchor',
+		'route' => $this->url('orgUnit/index'),
+		'script' =>'org_unit_index_script',
+		'hideForm' => true,
+		'spa' => $spa,
+)) ?>
+	
+function getPlaceList(param, input) {
+	var xhttp = new XMLHttpRequest();
+	xhttp.onreadystatechange = function() {
+		if (xhttp.readyState == 4 && xhttp.status == 200) {
+			document.getElementById('place_list').innerHTML = xhttp.responseText;
+<?php if ($config['ppitCoreSettings']['isTraceActive']) : ?>
+			console.log('getPlaceList, route = ' + '<?php echo $this->url('place/list') ?>?' + param + '=' + input);
+			console.log(xhttp.responseText);
+<?php endif;?>
+			eval(document.getElementById('place_list_script').innerHTML);
+		}
+	}
+	xhttp.open('GET', '<?php echo $this->url('place/list') ?>?' + param + '=' + input, true);
+	xhttp.send();
+}
+
+$('#place_name').keyup(function () {
+	var input = document.getElementById('place_name').value;
+	if (input == '' || input.length >= 2) {
+		getPlaceList('name', input);
+	}
+});
+
+$('#place_name').focus();
+
+getPlaceList('name', '');
+
+</script>

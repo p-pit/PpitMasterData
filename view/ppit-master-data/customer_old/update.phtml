@@ -1,0 +1,22 @@
+<?php
+    echo $this->partial('/partials/menu');
+?>
+<?php
+$this->headTitle($title);
+?>
+<div class="row">
+    <div class="col-md-6">
+		<div class="panel panel-default">
+            <div class="panel-heading">
+				<strong><?php echo $this->translate($title);?></strong>
+            </div>
+           	<div class="panel-body">
+<h3 align="center"><?php echo $this->translate('Update a customer');?></h3>
+<?php
+
+echo $this->partial('/partials/generic-form', array('route' => 'customer/update', 'form' => $this->form, 'id' => $this->id, 'returnUrl' => $this->url('customer')));
+?>
+			</div>
+		</div>
+	</div>
+</div>

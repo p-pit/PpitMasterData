@@ -1,0 +1,116 @@
+<?php
+$spa = $context->isSpaMode();
+$anchorStyle = ($spa) ? $context->getAnchorStyle() : 'classic';
+$current = 'orgUnit';
+?>
+
+<!-- Display header on MPA mode -->
+<?php if (!$spa) : ?>
+	<?php 
+		$this->current = 'admin';
+		echo $this->partial('/partials/menu'); 
+	?>
+<div class="row">
+    <div class="col-md-6 col-md-offset-3">
+<?php endif;?>
+
+		<div class="panel panel-default">
+            <div class="panel-heading">
+				<?php echo $this->translate('Organization', 'ppit-master-data', $context->getLocale()) ?>
+            </div>
+		    <div class="panel-body">
+				<table class="table-condensed">
+					<tr>
+						<td colspan="2">
+<!-- Go to places of business -->
+							<?php echo $this->partial('/partials/anchor-widget.phtml', array(
+									'text' => $this->translate('Places of business', 'ppit-master-data', $context->getLocale()),
+									'id' => 'place-anchor',
+									'anchorStyle' => $anchorStyle,
+									'spa' => $spa,
+							)) ?>
+			    		</td>
+			    	</tr>
+			    </table>
+
+		    	<div class="row">
+
+<!-- Filter on type -->
+				    <div class="col-md-6">
+						<div class="form-group has-feedback">
+							<label class="control-label" for="org_unit_type"><?php echo $this->translate('Type', 'ppit-core', $context->getLocale()) ?></label>
+							<input type="text" class="form-control" id="org_unit_type"/>
+							<span class="glyphicon glyphicon-search form-control-feedback"></span>
+						</div>
+					</div>
+
+<!-- Filter on identifier or name -->
+				    <div class="col-md-6">
+						<div class="form-group has-feedback">
+							<label class="control-label" for="org_unit_name"><?php echo $this->translate('Code or name contains', 'ppit-master-data', $context->getLocale()) ?></label>
+							<input type="text" class="form-control" id="org_unit_name"/>
+							<span class="glyphicon glyphicon-search form-control-feedback"></span>
+						</div>
+						
+					</div>
+				</div>
+
+<!-- Add or update section -->
+				<div id="org_unit_list"></div>
+				
+			</div>
+		</div>
+<?php if (!$spa) : ?>
+	</div>
+</div>
+<?php endif;?>
+
+<script id="org_unit_index_script">
+
+// Go to places of business
+<?php echo $this->partial('/partials/show-main-script', array(
+		'id' => 'place-anchor',
+		'route' => $this->url('place/index'),
+		'script' =>'place_index_script',
+		'hideForm' => true,
+		'spa' => $spa,
+)) ?>
+
+// Add or update section
+function getOrgUnitList(param, input) {
+	var xhttp = new XMLHttpRequest();
+	xhttp.onreadystatechange = function() {
+		if (xhttp.readyState == 4 && xhttp.status == 200) {
+			document.getElementById('org_unit_list').innerHTML = xhttp.responseText;
+<?php if ($config['ppitCoreSettings']['isTraceActive']) : ?>
+			console.log('getOrgUnitList, route = ' + '<?php echo $this->url('orgUnit/list') ?>?' + param + '=' + input);
+			console.log(xhttp.responseText);
+<?php endif;?>
+			eval(document.getElementById('org_unit_list_script').innerHTML);
+		}
+	}
+	xhttp.open('GET', '<?php echo $this->url('orgUnit/list') ?>?' + param + '=' + input, true);
+	xhttp.send();
+}
+
+$('#org_unit_type').keyup(function () {
+	var input = document.getElementById('org_unit_type').value;
+	if (input == '' || input.length >= 2) {
+		getOrgUnitList('type', input);
+	}
+	else {
+		document.getElementById('org_unit_list').innerHTML = '';
+	}
+});
+$('#org_unit_type').focus();
+
+$('#org_unit_name').keyup(function () {
+	var input = document.getElementById('org_unit_name').value;
+	if (input.length >= 2) {
+		getOrgUnitList('name', input);
+	}
+});
+
+getOrgUnitList('type', '');
+
+</script>

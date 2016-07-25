@@ -1,0 +1,339 @@
+<?php 
+$spa = $context->isSpaMode();
+$anchorStyle = ($spa) ? $context->getAnchorStyle() : 'classic';
+$isDeletable = $place->isDeletable();
+?>
+
+<!-- Display header on MPA mode -->
+<?php if (!$spa) : ?>
+	<?php 
+		$this->current = 'orgUnit';
+		echo $this->partial('/partials/menu'); 
+		echo $this->partial('/partials/view-controller'); 
+	?>
+<div class="row">
+    <div class="col-md-6 col-md-offset-3">
+<?php endif;?>
+
+		<div class="panel panel-default">
+            <div class="panel-heading">
+				<?php echo $this->translate('Places of business: '.(($id) ? 'update' : 'add'), 'ppit-master-data', $context->getLocale()) ?>
+ 				<div class="btn-group pull-right">
+					<?php echo $this->partial('/partials/anchor-widget.phtml', array(
+							'glyphicon' => 'glyphicon-remove',
+							'title' => $this->translate('Return to list', 'ppit-core', $context->getLocale()),
+							'id' => 'remove-anchor',
+							'anchorStyle' => $anchorStyle,
+							'spa' => $spa,
+					)) ?>
+ 				</div>
+			</div>
+           	<div class="panel-body">
+				<table class="table-condensed">
+					<tr>
+						<td colspan="2">
+
+<?php if ($id) : ?>
+<!-- Delete -->
+							<?php echo $this->partial('/partials/anchor-widget.phtml', array(
+									'glyphicon' => 'glyphicon-trash',
+									'title' => $this->translate('Delete', 'ppit-core', $context->getLocale()),
+									'id' => 'delete-anchor',
+									'anchorStyle' => $anchorStyle,
+									'class' => ($isDeletable) ? 'btn-danger' : 'btn-disabled',
+									'disabled' => !$isDeletable,
+									'spa' => $spa,
+							)) ?>
+<?php endif;?>
+						</td>
+					</tr>
+
+				</table>
+
+<!-- Form header -->
+<?php echo $this->partial('/partials/form-header', array(
+			'id' => $id,
+			'update_time' => $place->update_time,
+			'message' => $message,
+			'error' => $error,
+			'csrfForm' => $csrfForm,
+			'context' => $context,
+))
+$properties = array('update_time' => 'hidden');
+?>
+
+<?php if ($message == 'OK' || !$context->isAllowed('place/update')) $isDisabled = true; else $isDisabled = false; ?>
+	
+<!-- Identifier -->
+<?php
+	echo $this->partial('/partials/input-widget.phtml', array(
+		'property' => 'identifier',
+		'label' => '* '.$this->translate('Identifier', 'ppit-core', $context->getLocale()),
+		'value' => $place->identifier,
+		'isMandatory' => true,
+		'maxLength' => 255,
+		'context' => $context,
+		'isDisabled' => $isDisabled,
+));
+$properties['identifier'] = 'input';
+?>
+
+<!-- Name -->
+<?php
+	echo $this->partial('/partials/input-widget.phtml', array(
+		'property' => 'name',
+		'label' => '* '.$this->translate('Name', 'ppit-core', $context->getLocale()),
+		'value' => $place->name,
+		'isMandatory' => true,
+		'maxLength' => 255,
+		'context' => $context,
+		'isDisabled' => $isDisabled,
+));
+$properties['name'] = 'input';
+?>
+
+<!-- Opening date -->
+<?php echo $this->partial('/partials/date-widget.phtml', array(
+		'property' => 'opening_date',
+		'label' => $this->translate('Opening date', 'ppit-core', $context->getLocale()),
+		'value' => $place->opening_date,
+		'isMandatory' => false,
+		'minDate' => '0000-00-00',
+		'maxDate' => '9999-99-99',
+		'context' => $context,
+		'isDisabled' => $isDisabled,
+));
+$properties['opening_date'] = 'date';
+?>
+
+<!-- Closing date -->
+<?php echo $this->partial('/partials/date-widget.phtml', array(
+		'property' => 'closing_date',
+		'label' => $this->translate('Closing date', 'ppit-core', $context->getLocale()),
+		'value' => $place->closing_date,
+		'isMandatory' => false,
+		'minDate' => '0000-00-00',
+		'maxDate' => '9999-99-99',
+		'context' => $context,
+		'isDisabled' => $isDisabled,
+));
+$properties['closing_date'] = 'date';
+?>
+
+<!-- Tax regime -->
+<?php
+	echo $this->partial('/partials/select-widget.phtml', array(
+		'property' => 'tax_regime',
+		'label' => '* '.$this->translate('Tax regime', 'ppit-master-data', $context->getLocale()),
+		'modalities' => $place->availableTaxRegimes,
+		'value' => $place->tax_regime,
+		'isMandatory' => true,
+		'context' => $context,
+		'isDisabled' => $isDisabled,
+));
+$properties['tax_regime'] = 'select';
+?>
+
+<!-- Properties -->
+<?php foreach ($place->availableProperties as $property => $params) : ?>
+
+<!-- <?php echo $property ?> -->
+
+<?php if ($params['type'] == 'input') : ?>
+	<?php
+	echo $this->partial('/partials/input-widget.phtml', array(
+		'property' => $property,
+		'label' => $this->translate($params['label'], 'ppit-master-data', $context->getLocale()),
+		'value' => (array_key_exists($property, $place->properties)) ? $place->properties[$property] : null,
+		'isMandatory' => false,
+		'maxLength' => 255,
+		'context' => $context,
+		'isDisabled' => $isDisabled,
+	));
+	$properties[$property] = 'input';
+	?>
+
+<?php elseif ($params['type'] == 'number') : ?>
+	<?php echo $this->partial('/partials/number-widget.phtml', array(
+		'property' => $property,
+		'label' => $this->translate($params['label'], 'ppit-master-data', $context->getLocale()),
+		'value' => (array_key_exists($property, $place->properties)) ? $place->properties[$property] : null,
+		'isMandatory' => false,
+		'min' => $params['min'],
+		'max' => $params['max'],
+		'context' => $context,
+		'isDisabled' => $isDisabled,
+	));
+	$properties[$property] = 'number';
+	?>
+
+<?php elseif ($params['type'] == 'date') : ?>
+	<?php echo $this->partial('/partials/date-widget.phtml', array(
+		'property' => $property,
+		'label' => $this->translate($params['label'], 'ppit-master-data', $context->getLocale()),
+		'value' => (array_key_exists($property, $place->properties)) ? $place->properties[$property] : null,
+		'isMandatory' => false,
+		'minDate' => $params['minDate'],
+		'maxDate' => $params['maxDate'],
+		'context' => $context,
+		'isDisabled' => $isDisabled,
+	));
+	$properties[$property] = 'date';
+	?>
+
+<?php elseif ($params['type'] == 'textarea') : ?>
+	<?php echo $this->partial('/partials/textarea-widget.phtml', array(
+		'property' => $property,
+		'label' => $this->translate($params['label'], 'ppit-master-data', $context->getLocale()),
+		'rows' => 3, 
+		'value' => (array_key_exists($property, $place->properties)) ? $place->properties[$property] : null,
+		'isMandatory' => false,
+		'maxLength' => $params['maxLength'],
+		'context' => $context,
+		'isDisabled' => $isDisabled,
+	));
+	$properties[$property] = 'textarea';
+	?>
+					
+<?php elseif ($params['type'] == 'select') : ?>
+	<?php
+	$modalities = array();
+	foreach ($params['modalities'] as $modality) $modalities[$modality] = $modality;
+	echo $this->partial('/partials/select-widget.phtml', array(
+		'property' => $property,
+		'label' => $this->translate($params['label'], 'ppit-master-data', $context->getLocale()),
+		'modalities' => $modalities,
+		'value' => (array_key_exists($property, $place->properties)) ? $place->properties[$property] : null,
+		'isMandatory' => false,
+		'context' => $context,
+		'isDisabled' => $isDisabled,
+	));
+	$properties[$property] = 'select';
+	?>
+
+<?php elseif ($params['type'] == 'checkbox') : ?>
+	<?php
+	echo $this->partial('/partials/checkbox-widget.phtml', array(
+		'property' => $property,
+		'label' => $this->translate($params['label'], 'ppit-master-data', $context->getLocale()),
+		'value' => (array_key_exists($property, $place->properties)) ? $place->properties[$property] : null,
+		'context' => $context,
+		'isDisabled' => $isDisabled,
+	));
+	$properties[$property] = 'checkbox';
+	?>
+
+<?php endif;?>
+
+<?php endforeach;?>
+
+<!-- Reception contact -->
+					<h4>
+						<?php echo $this->translate('Reception contact', 'ppit-master-data', $context->getLocale()) ?>
+					</h4>
+<!-- Load the contact module -->
+<?php echo $this->partial('/partials/contact-update.phtml', array(
+		'instance_id' => $context->getInstanceId(),
+		'community_id' => $context->getCommunityId(),
+		'addMode' => !$id,	
+		'message' => $message,
+		'prefix' => 'reception_',
+		'contact' => $place->reception_contact,
+		'config' => $config,
+		'context' => $context,
+		'isDisabled' => $isDisabled,
+		'properties' => &$properties,
+)); ?>
+
+<!-- Delivery contact -->
+					<h4>
+						<?php echo $this->translate('Delivery contact', 'ppit-master-data', $context->getLocale()) ?>
+					</h4>
+<!-- Load the contact module -->
+<?php echo $this->partial('/partials/contact-update.phtml', array(
+		'instance_id' => $context->getInstanceId(),
+		'community_id' => $context->getCommunityId(),
+		'addMode' => !$id,	
+		'message' => $message,
+		'prefix' => 'delivery_',
+		'contact' => $place->delivery_contact,
+		'config' => $config,
+		'context' => $context,
+		'isDisabled' => $isDisabled,
+		'properties' => &$properties,
+)); ?>
+	
+<!-- Form footer -->
+<?php echo $this->partial('/partials/form-footer') ?>
+
+			</div>
+		</div>
+<?php if (!$spa) : ?>
+	</div>
+</div>
+<?php endif;?>
+
+<?php if (!$context->isSpaMode()) echo $this->partial('partials/view-controller') ?>
+
+<script id='place_update_script'>
+
+//Set datepicker on opening date
+	jQuery(document).ready(function($){
+	    $("#opening_date").datepicker();
+});
+
+// Close form
+<?php echo $this->partial('/partials/form-return-script', array(
+		'id' => 'remove-anchor',
+		'route' => $this->url('place/index'),
+		'spa' => $spa,
+)) ?>
+
+// Add
+<?php echo $this->partial('/partials/show-form-script', array(
+		'id' => 'add-anchor',
+		'route' => $this->url('place/update'),
+		'script' =>'place_update_script',
+		'spa' => $spa,
+)) ?>
+
+// Delete
+<?php echo $this->partial('/partials/show-form-script', array(
+		'id' => 'delete-anchor',
+		'route' => $this->url('place/delete', array('id' => $id)),
+		'script' =>'place_delete_script',
+		'spa' => $spa,
+)) ?>
+
+<?php if ($message == 'OK' || !$context->isAllowed('place/update')) : ?>
+
+<?php echo $this->partial('/partials/form-return-script', array(
+		'id' => 'foot-return-anchor',
+		'route' => $this->url('place/index'),
+		'spa' => $spa,
+)) ?>
+
+<?php else : ?>
+
+<?php echo $this->partial('/partials/form-return-script', array(
+		'id' => 'cancel-anchor',
+		'route' => $this->url('place/index'),
+		'spa' => $spa,
+)) ?>
+
+// Submit
+<?php
+echo $this->partial('/partials/form-button-script', array(
+		'context' => $context,
+		'id' => 'submit-button',
+		'formRoute' => $this->url('place/update', array('id' => $id)),
+		'formScript' => 'place_update_script',
+		'properties' => $properties,
+		'mainRoute' => $this->url('place/index'),
+		'mainScript' =>'place_index_script',
+		'hideForm' => false,
+)) ?>
+
+<?php endif;?>
+
+</script>

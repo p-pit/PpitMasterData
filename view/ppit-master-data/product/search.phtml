@@ -1,0 +1,103 @@
+<div class="panel panel-default">
+<div class="panel-heading" style="background: <?php echo $context->getInstance()->specifications['styleSheet']['panelHeadingBackground'] ?>; color: <?php echo $context->getInstance()->specifications['styleSheet']['panelHeadingColor'] ?>">
+		<strong>
+			<?php echo $this->translate('Products', 'ppit-master-data', $context->getLocale());?> - 
+			<span id="mode-text"></span>
+		</strong>
+	</div>
+	<div class="panel-body">
+
+<!-- Filters -->
+	    <div class="col-md-4">
+	
+		<div class="form-group">
+			<label class="col-sm-5 control-label"><span class="glyphicon glyphicon-search"></span></label>
+			<div class="col-sm-7">
+	    		<button type="button" class="form-control btn btn-default btn-xs" title="<?php echo $this->translate('Erase', 'ppit-core', $context->getLocale()) ?>" id="erase-button">
+					<span class="glyphicon glyphicon-remove"></span>
+				</button>
+			</div>
+		</div>
+	
+		<div class="form-group">
+			<label class="col-sm-5 control-label"><?php echo $this->translate('Brand', 'ppit-master-data', $context->getLocale()) ?></label>
+			<div class="col-sm-7">
+				<input class="form-control" type="text" id="search_brand" placeholder="<?php echo $this->translate('Contains', 'ppit-core', $context->getLocale()) ?>" />
+			</div>
+		</div>
+	
+		<div class="form-group">
+			<label class="col-sm-5 control-label"><?php echo $this->translate('Reference', 'ppit-master-data', $context->getLocale()) ?></label>
+			<div class="col-sm-7">
+				<input class="form-control" type="text" id="search_reference" placeholder="<?php echo $this->translate('Contains', 'ppit-core', $context->getLocale()) ?>" />
+			</div>
+		</div>
+	
+		<div class="form-group">
+			<label class="col-sm-5 control-label"><?php echo $this->translate('Caption', 'ppit-core', $context->getLocale()) ?></label>
+			<div class="col-sm-7">
+				<input class="form-control" type="text" id="search_caption" placeholder="<?php echo $this->translate('Contains', 'ppit-core', $context->getLocale()) ?>" />
+			</div>
+		</div>
+
+	<div><a id="add-criteria" href="#"><?php echo $this->translate('More criteria', 'ppit-core', $context->getLocale())?></a></div>
+	<div id="search-area">
+		
+		<div class="form-group">
+			<label class="col-sm-5 control-label"><?php echo $this->translate('Price', 'ppit-master-data', $context->getLocale()) ?></label>
+			<div class="col-sm-7">
+	    		<input class="form-control" type="text" id="search_min_price" class="form-control" placeholder="<?php echo $this->translate('Min', 'ppit-core', $context->getLocale()) ?>" />
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label class="col-sm-5 control-label">&nbsp;</label>
+			<div class="col-sm-7">
+	    		<input class="form-control" type="text" id="search_max_price" class="form-control" placeholder="<?php echo $this->translate('Max', 'ppit-core', $context->getLocale()) ?>" />
+			</div>
+		</div>
+	
+<?php foreach ($context->getInstance()->specifications['ppitMasterData']['properties'] as $propertyId => $property) : ?>
+		
+		<div class="form-group">
+			<label class="col-sm-5 control-label"><?php echo $property['labels'][$context->getLocale()] ?></label>
+			<div class="col-sm-7">
+				<input class="form-control" type="text" id="search_<?php echo $propertyId ?>" placeholder="<?php echo $this->translate('Contains', 'ppit-core', $context->getLocale()) ?>" />
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label class="col-sm-5 control-label">&nbsp;</label>
+			<div class="col-sm-7">
+	    		<input class="form-control" type="text" id="search_min_<?php echo $propertyId ?>" class="form-control" placeholder="<?php echo $this->translate('Min', 'ppit-core', $context->getLocale()) ?>" />
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label class="col-sm-5 control-label">&nbsp;</label>
+			<div class="col-sm-7">
+	    		<input class="form-control" type="text" id="search_max_<?php echo $propertyId ?>" class="form-control" placeholder="<?php echo $this->translate('Max', 'ppit-core', $context->getLocale()) ?>" />
+			</div>
+		</div>
+
+<?php endforeach;?>
+
+	</div>
+
+	    <div>&nbsp;</div>
+
+<!-- Actions -->
+	    <div>
+	    		<button type="button" class="btn btn-default" title="<?php echo $this->translate('Export', 'ppit-core', $context->getLocale()) ?>" id="export-button">
+					<span class="glyphicon glyphicon-cloud-download"></span>
+					<span><?php echo $this->translate('Export', 'ppit-core', $context->getLocale())?></span>
+				</button>
+	    </div>
+	    
+		<div>&nbsp;</div>
+		</div>
+		
+<!-- Add or update section -->
+		<div class="col-md-8" id="product-list-panel"></div>
+	</div>
+</div>

@@ -1,0 +1,77 @@
+<?php
+    echo $this->partial('/partials/menu');
+?>
+<?php
+$title = 'Contact import';
+$this->headTitle($title);
+?>
+<h1><?php echo $this->translate($title); ?></h1>
+<?php if (!$ok) : ?>
+<table class="table">
+	<tr class="<?php echo $this->cycle(array("even", "odd"))->next();?>">
+		<td style="color: red" colspan="3"><strong><?php echo $this->translate("Errors were found, the file cannot be imported:") ?></strong></td>
+	</tr>
+	<tr class="<?php echo $this->cycle(array("even", "odd"))->next();?>">
+		<td align="center"><strong><?php echo $this->translate('Line number');?></strong></td>
+		<td align="center"><strong><?php echo $this->translate('Column number');?></strong></td>
+		<td align="left"><strong><?php echo $this->translate('Error');?></strong></td>
+	</tr>
+	<?php foreach ($errors as $error) : ?>
+	<tr class="<?php echo $this->cycle(array("even", "odd"))->next();?>">
+		<td align="center"><?php echo $error['line'] ?></td>
+		<td align="center"><?php echo $error['column'] ?></td>
+		<td align="left"><?php echo $this->translate($error['caption']) ?></td>
+	</tr>
+	<?php endforeach; ?>
+</table>
+<?php else : ?>
+<table class ="table">
+	<tr class="<?php echo $this->cycle(array("even", "odd"))->next();?>">
+		<td align="center"><strong><?php echo $this->translate('Title');?></strong></td>
+		<td align="center"><strong><?php echo $this->translate('Last name');?></strong></td>
+		<td align="center"><strong><?php echo $this->translate('First name');?></strong></td>
+		<td align="center"><strong><?php echo $this->translate('Organization');?></strong></td>
+		<td align="center"><strong><?php echo $this->translate('Email');?></strong></td>
+		<td align="center"><strong><?php echo $this->translate('Work phone');?></strong></td>
+		<td align="center"><strong><?php echo $this->translate('Mobile');?></strong></td>
+		<td align="center"><strong><?php echo $this->translate('Address - street');?></strong></td>
+		<td align="center"><strong><?php echo $this->translate('Address - extended');?></strong></td>
+		<td align="center"><strong><?php echo $this->translate('Address - post box office');?></strong></td>
+		<td align="center"><strong><?php echo $this->translate('Address - zip');?></strong></td>
+		<td align="center"><strong><?php echo $this->translate('Address - city');?></strong></td>
+		<td align="center"><strong><?php echo $this->translate('Address - country');?></strong></td>
+		<td align="center"><strong><?php echo $this->translate('Role');?></strong></td>
+	</tr>
+	<tr class="<?php echo $this->cycle(array("even", "odd"))->next();?>">
+		<td colspan="14"><strong><?php echo $this->translate("The file is valid, the following rows will be imported:") ?></strong></td>
+	</tr>
+	<?php foreach ($not_duplicate as $row) : ?>
+	<tr class="<?php echo $this->cycle(array("even", "odd"))->next();?>">
+		<?php for ($i = 0; $i < count($row); $i++) : ?>
+		<td align="center"><?php echo $row[$i] ?></td>
+		<?php endfor;?>
+	</tr>
+	<?php endforeach; ?>
+	<?php if (count($duplicate) > 0) : ?>
+	<tr class="<?php echo $this->cycle(array("even", "odd"))->next();?>">
+		<td colspan="14"><strong><?php echo $this->translate("The following rows already exist and will be ignored:") ?></strong></td>
+	</tr>
+	<?php endif;?>
+	<?php foreach ($duplicate as $row) : ?>
+	<tr class="<?php echo $this->cycle(array("even", "odd"))->next();?>">
+	<?php for ($i = 0; $i < count($row); $i++) : ?>
+		<td align="center"><?php echo $row[$i] ?></td>
+	<?php endfor;?>
+	</tr>
+	<?php endforeach; ?>
+</table>
+<?php endif;?>
+<?php $url = $this->url('vcard/import', array('id' => $this->id));?>
+<form action="<?php echo $url; ?>" method="post">
+<div>
+    <input type="hidden" name="id" value="<?php echo (int) $this->id; ?>" />
+    <input type="submit" class="btn btn-primary" name="confirm" value="<?php echo $this->translate('Import the data') ?>" />
+    &nbsp;&nbsp;
+	<a href="<?php echo $this->url('link/index', array('id' => 0));?>"><?php echo $this->translate('Cancel') ?></a>
+</div>
+</form>

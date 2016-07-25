@@ -1,0 +1,44 @@
+<?php
+	$title = $this->translate('Customer', 'ppit-order', $context->getLocale());
+	echo $this->partial('/partials/menu');
+?>
+<?php $this->headTitle($title) ?>
+<div class="row">
+    <div class="col-md-6 col-md-offset-3">
+		<div class="panel panel-default">
+            <div class="panel-heading">
+				<strong><?php echo $this->translate('Delete Option', 'ppit-order', $context->getLocale()).' '.$option->caption?></strong>
+            </div>
+           	<div class="panel-body">
+           	
+           	<!--  CSRF 
+<?php// $element = $csrfForm->get('option_delete_csrf') ?>
+				    <div class="form-group">
+						<?php //echo $this->formElement($element) ?>
+<?php //if ($this->formElementErrors($element)) : ?>
+						<div class="col-sm-12"><p class="help-block"><?php //echo $this->translate('The form has expired, please input again', 'ppit-core', $context->getLocale()) ?></p></div>
+<?php //endif;?>
+					</div>
+           	-->
+           	
+			    <div class="row">
+					<div class="col-md-4" align="right"><strong><?php echo $this->translate('Option Caption', 'ppit-master-data', $context->getLocale()) ?></strong></div>
+					<div class="col-md-8"><?php echo $option->caption ?></div>
+				</div>
+
+				<form action="<?php echo $this->url('option/delete', array('id' => $option->id)) ?>" method="post">
+					<div>
+					    <div class="form-group">
+							<div class="col-sm-4">&nbsp;</div>
+							<div class="col-sm-8">
+								<input name="del" type="submit" id="submitbutton" class="btn btn-primary" value="Delete" >
+								&nbsp;&nbsp;
+								<a href="<?php echo $this->url('option/index') ?>"><?php echo $this->translate('Cancel', 'ppit-core', $context->getLocale()) ?></a>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>

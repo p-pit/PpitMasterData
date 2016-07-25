@@ -1,0 +1,69 @@
+<?php
+	$title = $this->translate('Options', 'ppit-order', $context->getLocale());
+    echo $this->partial('/partials/menu');
+?>
+<?php $this->headTitle($title); ?>
+<div class="row">
+    <div class="col-md-8 col-md-offset-2">
+		<div class="panel panel-default">
+
+           	<div class="panel-body">
+				<table class="table table-condensed">
+					<tr class="<?php echo $this->cycle(array("even", "odd"))->next();?>">
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td align="center"><strong><a href="<?php echo $this->url('option/index') ?>
+															?major=caption
+															<?php if ($major == 'caption' && $dir =='ASC') echo '&dir=DESC'; else echo '&dir=ASC' ?>">
+							<?php echo $this->translate('Caption', 'ppit-core', $context->getLocale());?></strong></td>
+
+						
+					</tr>
+					<tr class="<?php echo $this->cycle(array("even", "odd"))->next();?>">
+						<td colspan="16">
+							<a href="<?php echo $this->url('option/add');?>">
+								<img height="12" src="<?php echo $this->basePath('images/plus.png') ?>" title="<?php echo $this->translate('Add', 'ppit-core', $context->getLocale()) ?>" alt="<?php echo $this->translate('Add', 'ppit-core', $context->getLocale()) ?>" />
+							</a>
+						</td>
+					</tr>
+<?php foreach ($options as $option) : ?>
+					<tr>
+					
+					<!-- Update or detail -->
+	<?php if ($currentUser->isAllowed('option/update')) : ?>
+						<td>
+							<a href="<?php echo $this->url('option/update', array('id' => $option->id));?>">
+								<img height="12" src="<?php echo $this->basePath('images/edit_2.png') ?>" title="<?php echo $this->translate('Delete', 'ppit-core', $context->getLocale()) ?>" alt="<?php echo $this->translate('Delete', 'ppit-core', $context->getLocale()) ?>" />
+							</a>
+						</td>
+	<?php else : ?>
+						<td>
+							<a href="<?php echo $this->url('option/detail', array('id' => $option->id));?>">
+								<img height="12" src="<?php echo $this->basePath('images/zoom_plus_plain.png') ?>" title="<?php echo $this->translate('Update', 'ppit-core', $context->getLocale()) ?>" alt="<?php echo $this->translate('Update', 'ppit-core', $context->getLocale()) ?>" />
+							</a>
+						</td>
+	<?php endif; ?>
+					
+					<!-- Delete -->
+	<?php if ($currentUser->isAllowed('option/delete')) : ?>
+						<td>
+							<a href="<?php echo $this->url('option/delete', array('id' => $option->id));?>">
+								<img height="12" src="<?php echo $this->basePath('images/trash_can_2.png') ?>" title="<?php echo $this->translate('Delete', 'ppit-core', $context->getLocale()) ?>" alt="<?php echo $this->translate('Delete', 'ppit-core', $context->getLocale()) ?>" />
+							</a>
+						</td>
+	<?php else : ?>
+						<td>&nbsp;</td>
+	<?php endif; ?>
+							
+	
+					
+					<td align="center"><?php echo $option->caption ?></td>
+
+
+					</tr>
+<?php endforeach; ?>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>

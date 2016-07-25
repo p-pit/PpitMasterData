@@ -1,0 +1,199 @@
+
+function connectRemoveIcon(type, id, target)
+{
+	$('#' + id).click(function () {
+		$('#' + target).hide();
+		filterProductList(type);
+	});
+}
+
+function getParams(type) {
+
+	// Create a new FormData object.
+	var params = '?', todo = true;
+	
+	var brand = document.getElementById('search_brand').value;
+	if (brand.length >= 2) { params += 'brand=' + brand + '&'; todo = false; }
+	
+	var reference = document.getElementById('search_reference').value;
+	if (reference.length >= 2) { params += 'reference=' + reference + '&'; todo = false; }
+	
+	var caption = document.getElementById('search_caption').value;
+	if (caption.length >= 2) { params += 'caption=' + caption + '&'; todo = false; }
+	
+	var min_price = document.getElementById('search_min_price').value;
+	if (min_price.length >= 2) { params += 'min_price=' + min_price + '&'; todo = false; }
+
+	var max_price = document.getElementById('search_max_price').value;
+	if (max_price.length >= 2) { params += 'max_price=' + max_price + '&'; todo = false; }
+	
+<?php foreach ($context->getInstance()->specifications['ppitMasterData']['properties'] as $propertyId => $property) : ?>
+
+	var <?php echo $propertyId ?> = document.getElementById('search_<?php echo $propertyId ?>').value;
+	if (<?php echo $propertyId ?>.length >= 2) { params += '<?php echo $propertyId ?>=' + <?php echo $propertyId ?> + '&'; todo = false; }
+
+	var min_<?php echo $propertyId ?> = document.getElementById('search_min_<?php echo $propertyId ?>').value;
+	if (min_<?php echo $propertyId ?>) min_<?php echo $propertyId ?> = encodeDate(min_<?php echo $propertyId ?>);
+	if (min_<?php echo $propertyId ?>.length >= 2) { params += 'min_<?php echo $propertyId ?>=' + min_<?php echo $propertyId ?> + '&'; todo = false; }
+
+	var max_<?php echo $propertyId ?> = document.getElementById('search_max_<?php echo $propertyId ?>').value;
+	if (max_<?php echo $propertyId ?>) max_<?php echo $propertyId ?> = encodeDate(max_<?php echo $propertyId ?>);
+	if (max_<?php echo $propertyId ?>.length >= 2) { params += 'max_<?php echo $propertyId ?>=' + max_<?php echo $propertyId ?> + '&'; todo = false; }
+
+<?php endforeach;?>
+
+	$('#mode-text').text((todo) ? '<?php echo $this->translate('Special offers', 'ppit-master-data', $context->getLocale())?>' : '<?php echo $this->translate('Search', 'ppit-core', $context->getLocale())?>');
+
+	return params;
+}
+
+// Export the list
+function exportProductList(type) {
+
+	var params = getParams(type);
+	document.location.href = '<?php echo $this->url('product/export') ?>/' + type + params;
+}
+
+function eraseProductSearch(type) {
+	$('#search_brand').val('');
+	$('#search_reference').val('');
+	$('#search_caption').val('');
+	$('#search_min_price').val('');
+	$('#search_max_price').val('');
+
+<?php foreach ($context->getInstance()->specifications['ppitMasterData']['properties'] as $propertyId => $property) : ?>
+	$('#search_<?php echo $propertyId ?>').val('');
+	$('#search_min_<?php echo $propertyId ?>').val('');
+	$('#search_max_<?php echo $propertyId ?>').val('');
+<?php endforeach;?>
+
+	getProductList(type, getParams(type), 'caption', 'ASC');
+}
+
+function sortProductList(type, criterion) {
+
+	var dir;
+	ascCriterion = $('.glyphicon-triangle-top').first().parent().attr('id');
+	descCriterion = $('.glyphicon-triangle-bottom').first().parent().attr('id');
+	if (criterion + '-anchor' == ascCriterion) dir = 'DESC'; else dir = 'ASC';
+	getProductList(type, getParams(type), criterion, dir);
+}
+
+function filterProductList(type) {
+
+	ascCriterion = $('.glyphicon-triangle-top').first().parent().attr('id');
+	descCriterion = $('.glyphicon-triangle-bottom').first().parent().attr('id');
+	if (ascCriterion) {
+		criterion = ascCriterion.split('-')[0];
+		dir = 'ASC';
+	}
+	getProductList(type, getParams(type), criterion, dir);
+}
+
+function connectProductSearchInputs(type) {
+
+	$('#export-button').click(function () { exportProductList(type); });
+	
+	$('#search_brand').keyup(function () { filterProductList(type); });
+	$('#search_reference').keyup(function () { filterProductList(type); });
+	$('#search_caption').keyup(function () { filterProductList(type); });
+	$('#search_min_price').keyup(function () { filterProductList(type); });
+	$('#search_max_price').keyup(function () { filterProductList(type); });
+	
+	$('#erase-button').unbind();
+	$('#erase-button').click(function () { eraseProductSearch(type); });
+
+<?php foreach ($context->getInstance()->specifications['ppitMasterData']['properties'] as $propertyId => $property) : ?>
+	$('#search_<?php echo $propertyId ?>').keyup(function () { filterProductList(type); });
+	$('#search_min_<?php echo $propertyId ?>').keyup(function () { filterProductList(type); });
+	$('#search_max_<?php echo $propertyId ?>').keyup(function () { filterProductList(type); });
+<?php endforeach;?>
+}
+
+// Load the list
+function getProductList(type, params, major, dir) {		
+
+	// Execute the ajax request
+	route = '<?php echo $this->url('product/list') ?>/' + type + params + '&major=' + major + ((dir =='ASC') ? '&dir=ASC' : '&dir=DESC');
+	xhttp = new XMLHttpRequest();
+	xhttp.open("GET", route, true);
+	xhttp.onreadystatechange = function() {
+
+		if (xhttp.readyState == 4 <?php if (!$config['ppitCoreSettings']['isTraceActive']) echo '&& xhttp.status == 200' ?>) {
+			document.getElementById('product-list-panel').innerHTML = xhttp.responseText;
+<?php if ($config['ppitCoreSettings']['isTraceActive']) : ?>
+			console.log('showing panel: product-list-panel, url = ' + route);
+			console.log(xhttp.responseText);
+<?php endif;?>
+			
+			// Connect the sort anchors
+			$('.ppit-sort-anchor').each(function () {
+				$(this).click(function () {
+					sortProductList(type, $(this).attr('id').split('-')[0]);
+				});
+			});
+			
+			// Connect the detail anchors
+			$('.product-detail-anchor').each(function () {
+				$(this).click(function () {
+					getProductDetail(type, $(this).attr('id').split('_')[1]);
+				});
+			});
+		}
+	}
+	xhttp.send();
+}
+
+// Load the detail panel
+function getProductDetail(type, id) {
+
+	// Ensure the target is displayed
+	$('#form_action').show();
+
+	// Anchor to the new panel
+	$(location).attr('hash', 'form_action');
+
+	var route = '<?php echo $this->url('product/detail') ?>/' + type + '/' + id;
+
+	// Execute the ajax request
+	xhttp = new XMLHttpRequest();
+	xhttp.open("GET", route, true);
+	xhttp.onreadystatechange = function() {
+		if (xhttp.readyState == 4 <?php if (!$config['ppitCoreSettings']['isTraceActive']) echo '&& xhttp.status == 200' ?>) {
+			document.getElementById('product_1_panel').innerHTML = xhttp.responseText;
+<?php if ($config['ppitCoreSettings']['isTraceActive']) : ?>
+			console.log('showing panel: product_1_panel, url = ' + route);
+			console.log(xhttp.responseText);
+<?php endif;?>
+
+			connectRemoveIcon(type, 'remove-anchor', 'product_1_panel');
+		}
+	}
+	xhttp.send();
+
+	// Highlight the clicked button (and only it in its class)
+	$('.index-btn').removeClass("btn-primary").addClass("btn-default");
+	$('#product-detail-anchor_' + id).removeClass("btn-default").addClass("btn-primary");
+}
+
+function activateProduct(type) {
+
+	// Load the search panel and highlight the menu entry
+	loadPanel('search_panel', '<?php echo $this->url('product/search') ?>/' + type);
+	$('.menu-btn').removeClass("btn-primary").addClass("btn-default");
+	var productAnchor;
+	productAnchor = '#' + type + '-anchor';
+	$(productAnchor).removeClass("btn-default").addClass("btn-primary");
+	$('#mode-text').text('<?php echo $this->translate('Special offers', 'ppit-master-data', $context->getLocale())?>');
+	
+	// Connect the search inputs
+	connectProductSearchInputs(type);
+	
+	getProductList(type, '?', 'caption', 'ASC');
+	
+	$('#add-criteria').click(function () {
+		$('#search-area').show();
+		$('#add-criteria').hide();
+	});
+	$('#search-area').hide();
+}
