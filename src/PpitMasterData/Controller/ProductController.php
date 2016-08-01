@@ -21,7 +21,7 @@ class ProductController extends AbstractActionController
 		$community_id = (int) $context->getCommunityId();
 		$contact = Vcard::getNew($instance_id, $community_id);*/
 
-		$menu = $context->getInstance()->specifications['menu'];
+		$menu = $context->getConfig('menu');
 		
     	return new ViewModel(array(
     			'context' => $context,

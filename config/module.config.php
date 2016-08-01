@@ -548,4 +548,7 @@ return array(
 	'ppitContactDependencies' => array(
 			'md_place' => new \PpitMasterData\Model\Place,
 	),
+	'product/index' => array(
+			'title' => array('en_US' => 'P-PIT Sales', 'fr_FR' => 'P-PIT Ventes'),
+	),
 );
