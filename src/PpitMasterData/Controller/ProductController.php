@@ -16,10 +16,6 @@ class ProductController extends AbstractActionController
 
 		// Retrieve the type
 		$type = $this->params()->fromRoute('type', 0);
-/*
-		$instance_id = $context->getInstanceId();
-		$community_id = (int) $context->getCommunityId();
-		$contact = Vcard::getNew($instance_id, $community_id);*/
 
 		$menu = $context->getConfig('menu');
 		
