@@ -32,13 +32,24 @@ class Product implements InputFilterAwareInterface
     public $property_8;
     public $property_9;
     public $property_10;
-    public $prices;
+    public $variants;
+    public $vat_1_id;
+    public $vat_1_share;
+    public $vat_2_id;
+    public $vat_2_share;
+    public $vat_3_id;
+    public $vat_3_share;
+    public $vat_4_id;
+    public $vat_4_share;
+    public $vat_5_id;
+    public $vat_5_share;
     public $update_time;
     
     // Deprecated
     public $product_category_id;
     public $properties;
     public $criteria;
+    public $prices;
     
     // Additional fields
     public $product_category;
@@ -87,14 +98,25 @@ class Product implements InputFilterAwareInterface
         $this->property_8 = (isset($data['property_8'])) ? $data['property_8'] : null;
         $this->property_9 = (isset($data['property_9'])) ? $data['property_9'] : null;
         $this->property_10 = (isset($data['property_10'])) ? $data['property_10'] : null;
-        $this->prices = (isset($data['prices'])) ? json_decode($data['prices'], true) : array();
-        $this->update_time = (isset($data['update_time'])) ? json_decode($data['update_time']) : array();
-        
+        $this->variants = (isset($data['variants'])) ? json_decode($data['variants'], true) : array();
+        $this->vat_1_id = (isset($data['vat_1_id'])) ? $data['vat_1_id'] : null;
+        $this->vat_1_share = (isset($data['vat_1_share'])) ? $data['vat_1_share'] : null;
+        $this->vat_2_id = (isset($data['vat_2_id'])) ? $data['vat_2_id'] : null;
+        $this->vat_2_share = (isset($data['vat_2_share'])) ? $data['vat_2_share'] : null;
+        $this->vat_3_id = (isset($data['vat_3_id'])) ? $data['vat_3_id'] : null;
+        $this->vat_3_share = (isset($data['vat_3_share'])) ? $data['vat_3_share'] : null;
+        $this->vat_4_id = (isset($data['vat_4_id'])) ? $data['vat_4_id'] : null;
+        $this->vat_4_share = (isset($data['vat_4_share'])) ? $data['vat_4_share'] : null;
+        $this->vat_5_id = (isset($data['vat_5_id'])) ? $data['vat_5_id'] : null;
+        $this->vat_5_share = (isset($data['vat_5_share'])) ? $data['vat_5_share'] : null;
+        $this->update_time = (isset($data['update_time'])) ? $data['update_time'] : array();
+
         // Deprecated
         $this->product_category_id = (isset($data['product_category_id'])) ? $data['product_category_id'] : null;
         $this->properties = (isset($data['properties'])) ? json_decode($data['properties'], true) : array();
         $this->criteria = (isset($data['criteria'])) ? $data['criteria'] : null;
-
+        $this->prices = (isset($data['prices'])) ? json_decode($data['prices'], true) : array();
+        
         // Additional fields
         $this->product_category = (isset($data['product_category'])) ? $data['product_category'] : null;
     }
@@ -120,13 +142,24 @@ class Product implements InputFilterAwareInterface
     	$data['property_8'] = $this->property_8;
     	$data['property_9'] = $this->property_9;
     	$data['property_10'] = $this->property_10;
-	    $data['prices'] = json_encode($this->prices);
-
+	    $data['variants'] = json_encode($this->variants);
+	    $data['vat_1_id'] = $this->vat_1_id;
+	    $data['vat_1_share'] = $this->vat_1_share;
+	    $data['vat_2_id'] = $this->vat_2_id;
+	    $data['vat_2_share'] = $this->vat_2_share;
+	    $data['vat_3_id'] = $this->vat_3_id;
+	    $data['vat_3_share'] = $this->vat_3_share;
+	    $data['vat_4_id'] = $this->vat_4_id;
+	    $data['vat_4_share'] = $this->vat_4_share;
+	    $data['vat_5_id'] = $this->vat_5_id;
+	    $data['vat_5_share'] = $this->vat_5_share;
+	     
 	    // Deprecated
     	$data['product_category_id'] = (int) $this->product_category_id;
 	    $data['properties'] = json_encode($this->properties);
 	    $data['criteria'] = $this->criteria;
-	    
+	    $data['prices'] = json_encode($this->prices);
+	     
 	    return $data;
     }
 
@@ -139,11 +172,10 @@ class Product implements InputFilterAwareInterface
     
     	// Filter on type
     	if ($type) $where->equalTo('type', $type);
-    
+
     	// Todo list vs search modes
     	if ($mode == 'todo') {
-    
-    		$todo = $context->getInstance()->specifications['ppitMasterData']['todo'][$type];
+    		$todo = $context->getConfig('ppitProduct')['todo'];
     		foreach($todo as $role => $properties) {
     			if ($context->hasRole($role)) {
     				foreach($properties as $property => $predicate) {
@@ -172,12 +204,27 @@ class Product implements InputFilterAwareInterface
     
     	// Sort the list
     	$select->where($where)->order(array($major.' '.$dir, 'caption'));
-    
     	$cursor = Product::getTable()->selectWith($select);
     	$products = array();
     	foreach ($cursor as $product) {
-    		$product->properties = $product->toArray();
-    		$products[] = $product;
+    		if (count($product->variants) > 0) $keep = false;
+    		else $keep = true;
+    		foreach ($product->variants as $variantId => $variantCriteria) {
+    			$keepVariant = true;
+    			foreach ($context->getConfig('ppitProduct'.(($type) ? '/'.$type : ''))['criteria'] as $criterion => $unused) {
+    				if (array_key_exists($criterion, $params)) {
+    					if ($variantCriteria[$criterion] != $params[$criterion]) $keepVariant = false;
+    				}
+    			}
+    			if ($keepVariant) {
+   					$keep = true;
+    				break;
+    			}
+   			}
+    		if ($keep) {
+    			$product->properties = $product->toArray();
+	    		$products[] = $product;
+    		}
     	}
     
     	return $products;

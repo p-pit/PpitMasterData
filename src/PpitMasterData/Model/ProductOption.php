@@ -15,12 +15,16 @@ class ProductOption implements InputFilterAwareInterface
     public $caption;
     public $description;
     public $is_available;
-    public $prices;
+    public $variants;
+    public $vat_id;
     public $update_time;
 
+    // Deprecated
+    public $prices;
+    
     // Additional properties from joined entities
     public $price;
-
+    
     // Transient properties
     public $product;
     
@@ -51,9 +55,13 @@ class ProductOption implements InputFilterAwareInterface
         $this->caption = (isset($data['caption'])) ? $data['caption'] : null;
         $this->description = (isset($data['description'])) ? $data['description'] : null;
         $this->is_available = (isset($data['is_available'])) ? $data['is_available'] : null;
-        $this->prices = (isset($data['prices'])) ? json_decode($data['prices'], true) : array();
+        $this->variants = (isset($data['variants'])) ? json_decode($data['variants'], true) : array();
+        $this->vat_id = (isset($data['vat_id'])) ? $data['vat_id'] : null;
         $this->update_time = (isset($data['update_time'])) ? json_decode($data['update_time']) : array();
 
+        // Deprecated
+        $this->prices = (isset($data['prices'])) ? json_decode($data['prices'], true) : array();
+        
         // Addistional fields
         $this->price = (isset($data['price'])) ? $data['price'] : null;
     }
@@ -67,8 +75,13 @@ class ProductOption implements InputFilterAwareInterface
     	$data['caption'] = $this->caption;
     	$data['description'] = $this->description;
     	$data['is_available'] = (int) $this->is_available;
+    	$data['variants'] = json_encode($this->variants);
+    	$data['vat_id'] = $this->vat_id;
+    	 
+    	// Deprecated
     	$data['prices'] = json_encode($this->prices);
-       	return $data;
+
+    	return $data;
     }
 
     public static function instanciate($product_id)

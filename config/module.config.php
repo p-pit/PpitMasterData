@@ -235,6 +235,15 @@ return array(
         										),
         								),
         						),
+        						'criteria' => array(
+        								'type' => 'segment',
+        								'options' => array(
+        										'route' => '/criteria[/:instance_caption][/:type]',
+        										'defaults' => array(
+        												'action' => 'criteria',
+        										),
+        								),
+        						),
         						'search' => array(
         								'type' => 'segment',
         								'options' => array(
@@ -250,6 +259,15 @@ return array(
         										'route' => '/list[/:type]',
         										'defaults' => array(
         												'action' => 'list',
+        										),
+        								),
+        						),
+        						'restList' => array(
+        								'type' => 'segment',
+        								'options' => array(
+        										'route' => '/rest-list[/:instance_caption][/:type]',
+        										'defaults' => array(
+        												'action' => 'restList',
         										),
         								),
         						),
@@ -471,12 +489,14 @@ return array(
 				// Product
 				array('route' => 'product', 'roles' => array('user')),
 				array('route' => 'product/index', 'roles' => array('user')),
+				array('route' => 'product/criteria', 'roles' => array('guest')),
+				array('route' => 'product/restList', 'roles' => array('guest')),
 				array('route' => 'product/search', 'roles' => array('user')),
 				array('route' => 'product/detail', 'roles' => array('user')),
 				array('route' => 'product/update', 'roles' => array('admin')),
 				array('route' => 'product/matrix', 'roles' => array('admin')),
 				array('route' => 'product/delete', 'roles' => array('admin')),
-				
+
 				// Product category
 				array('route' => 'productCategory', 'roles' => array('admin')),
 				array('route' => 'productCategory/index', 'roles' => array('admin')),
@@ -552,7 +572,16 @@ return array(
 	'ppitContactDependencies' => array(
 			'md_place' => new \PpitMasterData\Model\Place,
 	),
-	'product/index' => array(
+		
+	'ppitProduct' => array(
+			'criteria' => array(),
+			'todo' => array(
+					'sales_manager' => array(),
+					'business_owner' => array(),
+			),
+	),
+		
+	'ppitProduct/index' => array(
 			'title' => array('en_US' => 'P-PIT Sales', 'fr_FR' => 'P-PIT Ventes'),
 	),
 );

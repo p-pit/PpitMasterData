@@ -6,6 +6,7 @@ use PpitCore\Model\Context;
 use PpitMasterData\Model\Product;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
+use Zend\View\Model\JsonModel;
 
 class ProductController extends AbstractActionController
 {
@@ -28,8 +29,44 @@ class ProductController extends AbstractActionController
 //    			'contact' => $contact,
     	));
     }
-	public function getFilters($params)
+    
+    public function criteriaAction()
+    {
+    	$context = Context::getCurrent();
+
+    	$instance_caption = $this->params()->fromRoute('instance_caption', null);
+    	$type = $this->params()->fromRoute('type', null);
+    	 
+    	$safe = $context->getConfig()['ppitUserSettings']['safe'];
+    	$safeEntry = $safe[$instance_caption];
+    	$username = null;
+    	$password = null;
+    
+    	// Check basic authentication
+    	if (isset($_SERVER['PHP_AUTH_USER'])) {
+    		$username = $_SERVER['PHP_AUTH_USER'];
+    		$password = $_SERVER['PHP_AUTH_PW'];
+    	} elseif (isset($_SERVER['HTTP_AUTHORIZATION'])) {
+    		if (strpos(strtolower($_SERVER['HTTP_AUTHORIZATION']),'basic')===0)
+    			list($username, $password) = explode(':',base64_decode(substr($_SERVER['HTTP_AUTHORIZATION'], 6)));
+    	}
+    	if (!array_key_exists($username, $safeEntry) || $password != $safeEntry[$username]) {
+    		 
+    		// Write to the log
+    		$logger->info('product/criteria/'.$instance_caption.'/'.$type.';401;'.$username);
+    		$this->getResponse()->setStatusCode('401');
+    		return $this->getResponse();
+    	}
+    	else {
+    		return new JsonModel($context->getConfig('ppitProduct'.(($type) ? '/'.$type : ''))['criteria']);
+    	}
+    }
+    
+	public function getFilters($params, $type = null)
 	{
+		// Retrieve the context
+		$context = Context::getCurrent();
+		
 		// Retrieve the query parameters
 		$filters = array();
 
@@ -58,6 +95,11 @@ class ProductController extends AbstractActionController
 			if ($max_property) $filters['max_property_'.$i] = $max_property;
 		}
 		
+		foreach ($context->getConfig('ppitProduct'.(($type) ? '/'.$type : ''))['criteria'] as $criterion => $unused) {
+			$value = ($params()->fromQuery($criterion, null));
+			if ($value) $filters[$criterion] = $value;
+		}
+		
 		return $filters;
 	}
 	
@@ -84,11 +126,11 @@ class ProductController extends AbstractActionController
 		// Retrieve the context
 		$context = Context::getCurrent();
 
-		$params = $this->getFilters($this->params());
-
 		// Retrieve the order type
 		$type = $this->params()->fromRoute('type', null);
-		
+
+		$params = $this->getFilters($this->params(), $type);
+
 		$major = ($this->params()->fromQuery('major', 'caption'));
 		$dir = ($this->params()->fromQuery('dir', 'ASC'));
 
@@ -121,7 +163,39 @@ class ProductController extends AbstractActionController
    	{
    		return $this->getList();
    	}
-    
+
+   	public function restListAction()
+   	{
+   		$context = Context::getCurrent();
+   	
+   		$instance_caption = $this->params()->fromRoute('instance_caption', null);
+   		$type = $this->params()->fromRoute('type', null);
+   	
+   		$safe = $context->getConfig()['ppitUserSettings']['safe'];
+   		$safeEntry = $safe[$instance_caption];
+   		$username = null;
+   		$password = null;
+   	
+   		// Check basic authentication
+   		if (isset($_SERVER['PHP_AUTH_USER'])) {
+   			$username = $_SERVER['PHP_AUTH_USER'];
+   			$password = $_SERVER['PHP_AUTH_PW'];
+   		} elseif (isset($_SERVER['HTTP_AUTHORIZATION'])) {
+   			if (strpos(strtolower($_SERVER['HTTP_AUTHORIZATION']),'basic')===0)
+   				list($username, $password) = explode(':',base64_decode(substr($_SERVER['HTTP_AUTHORIZATION'], 6)));
+   		}
+   		if (!array_key_exists($username, $safeEntry) || $password != $safeEntry[$username]) {
+   			 
+   			// Write to the log
+   			$logger->info('product/restList/'.$instance_caption.'/'.$type.';401;'.$username);
+   			$this->getResponse()->setStatusCode('401');
+   			return $this->getResponse();
+   		}
+   		else {
+   			return new JsonModel($this->getList()->products);
+   		}
+   	}
+   	
     public function detailAction()
     {
     	// Retrieve the context
