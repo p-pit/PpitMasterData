@@ -2,6 +2,7 @@
 namespace PpitMasterData\Model;
 
 use PpitCore\Model\Context;
+use Zend\Db\Sql\Where;
 use Zend\InputFilter\Factory as InputFactory;
 use Zend\InputFilter\InputFilter;
 use Zend\InputFilter\InputFilterAwareInterface;
@@ -10,6 +11,7 @@ use Zend\InputFilter\InputFilterInterface;
 class ProductOption implements InputFilterAwareInterface
 {
     public $id;
+    public $status;
     public $product_id;
     public $reference;
     public $caption;
@@ -27,6 +29,7 @@ class ProductOption implements InputFilterAwareInterface
     
     // Transient properties
     public $product;
+    public $properties;
     
     protected $inputFilter;
 
@@ -50,6 +53,7 @@ class ProductOption implements InputFilterAwareInterface
     public function exchangeArray($data)
     {
         $this->id = (isset($data['id'])) ? $data['id'] : null;
+        $this->status = (isset($data['status'])) ? $data['status'] : null;
         $this->product_id = (isset($data['product_id'])) ? $data['product_id'] : null;
         $this->reference = (isset($data['reference'])) ? $data['reference'] : null;
         $this->caption = (isset($data['caption'])) ? $data['caption'] : null;
@@ -70,6 +74,7 @@ class ProductOption implements InputFilterAwareInterface
     {
     	$data = array();
     	$data['id'] = (int) $this->id;
+    	$data['status'] = $this->status;
     	$data['product_id'] = (int) $this->product_id;
     	$data['reference'] = $this->reference;
     	$data['caption'] = $this->caption;
@@ -84,12 +89,57 @@ class ProductOption implements InputFilterAwareInterface
     	return $data;
     }
 
-    public static function instanciate($product_id)
+    public static function instanciate($product_id = null)
     {
     	$productOption = new ProductOption;
     	$productOption->product_id = $product_id;
-    	$productOption->product = Product::get($product_id);
+    	if ($product_id) $productOption->product = Product::get($product_id);
     	return $productOption;
+    }
+
+    public static function getList($params, $major = 'reference', $dir = 'ASC', $mode = 'search')
+    {
+    	$context = Context::getCurrent();
+    	$select = ProductOption::getTable()->getSelect();
+    	 
+    	$where = new Where();
+    	$where->notEqualTo('md_product_option.status', 'deleted');
+    
+    	// Todo list vs search modes
+    	if ($mode == 'todo') {
+/*    
+    		$todo = $context->getConfig('commitment'.(($type) ? '/'.$type : ''))['todo'];
+    		foreach($todo as $role => $properties) {
+    			if ($context->hasRole($role)) {
+    				foreach($properties as $property => $predicate) {
+    					if ($predicate['selector'] == 'equalTo') $where->equalTo('commitment.'.$property, $predicate['value']);
+    					elseif ($predicate['selector'] == 'in') $where->in('commitment.'.$property, $predicate['value']);
+    					elseif ($predicate['selector'] == 'deadline') $where->lessThanOrEqualTo('commitment.'.$property, date('Y-m-d', strtotime(date('Y-m-d').'+ '.$predicate['value'].' days')));
+    				}
+    			}
+    		}*/
+    	}
+    	else {
+    
+    		// Set the filters
+    		foreach ($params as $propertyId => $property) {
+    			if (substr($propertyId, 0, 4) == 'min_') $where->greaterThanOrEqualTo('md_product_option.'.substr($propertyId, 4), $params[$propertyId]);
+    			elseif (substr($propertyId, 0, 4) == 'max_') $where->lessThanOrEqualTo('md_product_option.'.substr($propertyId, 4), $params[$propertyId]);
+    			else $where->like('md_product_option.'.$propertyId, '%'.$params[$propertyId].'%');
+    		}
+    	}
+    
+    	// Sort the list
+    	$select->where($where)->order(array($major.' '.$dir, 'reference'));
+    
+    	$cursor = ProductOption::getTable()->selectWith($select);
+    	$options = array();
+    	foreach ($cursor as $option) {
+    		$option->properties = $option->toArray();
+    		$options[] = $option;
+    	}
+    
+    	return $options;
     }
     
     public static function get($id)
@@ -103,11 +153,13 @@ class ProductOption implements InputFilterAwareInterface
     {
     	$config = Context::getCurrent()->getConfig();
     	
+    	$this->status = trim(strip_tags($data['status']));
     	$this->reference = trim(strip_tags($data['reference']));
     	$this->caption = trim(strip_tags($data['caption']));
     	$this->description = trim(strip_tags($data['description']));
     	$this->is_available = (int)$data['is_available'];
     
+    	if ($this->status == '' || strlen($this->status) > 255) return 'Integrity';
     	if ($this->reference == '' || strlen($this->reference) > 255) return 'Integrity';
     	if ($this->caption == '' || strlen($this->caption) > 255) return 'Integrity';
     	if (strlen($this->description) > 2047) return 'Integrity';
@@ -130,6 +182,7 @@ class ProductOption implements InputFilterAwareInterface
     	$config = Context::getCurrent()->getConfig();
 
     	$data = array();
+    	$data['status'] = $request->getPost('status');
     	$data['reference'] = $request->getPost('reference');
     	$data['caption'] = $request->getPost('caption');
     	$data['description'] = $request->getPost('description');

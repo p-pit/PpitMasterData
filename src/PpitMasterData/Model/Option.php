@@ -86,7 +86,7 @@ class Option implements InputFilterAwareInterface
     
     	return $data;
     }
-
+    
     public static function getTable()
     {
     	if (!Option::$table) {

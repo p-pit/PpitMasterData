@@ -15,6 +15,7 @@ use Zend\InputFilter\InputFilterInterface;
 class Product implements InputFilterAwareInterface
 {
     public $id;
+    public $status;
     public $community_id;
     public $type;
     public $brand;
@@ -81,6 +82,7 @@ class Product implements InputFilterAwareInterface
     public function exchangeArray($data)
     {
         $this->id = (isset($data['id'])) ? $data['id'] : null;
+        $this->status = (isset($data['status'])) ? $data['status'] : null;
         $this->community_id = (isset($data['community_id'])) ? $data['community_id'] : null;
         $this->type = (isset($data['type'])) ? $data['type'] : null;
         $this->brand = (isset($data['brand'])) ? $data['brand'] : null;
@@ -125,6 +127,7 @@ class Product implements InputFilterAwareInterface
     {
     	$data = array();
     	$data['id'] = (int) $this->id;
+    	$data['status'] = $this->status;
     	$data['community_id'] = (int) $this->community_id;
     	$data['type'] = $this->type;
     	$data['brand'] = $this->brand;
@@ -163,7 +166,7 @@ class Product implements InputFilterAwareInterface
 	    return $data;
     }
 
-    public static function getList($type, $params, $major, $dir, $mode)
+    public static function getList($type, $params, $major = 'caption', $dir = 'ASC', $mode = 'search')
     {
     	$context = Context::getCurrent();
     	$select = Product::getTable()->getSelect();
@@ -230,13 +233,9 @@ class Product implements InputFilterAwareInterface
     	return $products;
     }
 
-    public static function instanciate($product_category_id)
+    public static function instanciate()
     {
-    	$context = Context::getCurrent();
 		$product = new Product;
-		$product->community_id = $context->getCommunityId();
-		$product->product_category_id = $product_category_id;
-		$product->product_category = ProductCategory::get($product_category_id);
 		return $product;
     }
 
@@ -318,6 +317,7 @@ class Product implements InputFilterAwareInterface
     	$config = Context::getCurrent()->getConfig();
 
     	// Retrieve the data from the request
+    	$this->status = trim(strip_tags($data['status']));
     	$this->brand = trim(strip_tags($data['brand']));
     	$this->reference = trim(strip_tags($data['reference']));
     	$this->caption = trim(strip_tags($data['caption']));
@@ -352,6 +352,7 @@ class Product implements InputFilterAwareInterface
     public function loadDataFromRequest($request) {
     	$config = Context::getCurrent()->getConfig();
     	$data = array();
+    	$data['status'] = $request->getPost('status');
     	$data['brand'] = $request->getPost('brand');
     	$data['reference'] = $request->getPost('reference');
     	$data['caption'] = $request->getPost('caption');
