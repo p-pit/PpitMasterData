@@ -34,16 +34,9 @@ class Product implements InputFilterAwareInterface
     public $property_9;
     public $property_10;
     public $variants;
-    public $vat_1_id;
-    public $vat_1_share;
-    public $vat_2_id;
-    public $vat_2_share;
-    public $vat_3_id;
-    public $vat_3_share;
-    public $vat_4_id;
-    public $vat_4_share;
-    public $vat_5_id;
-    public $vat_5_share;
+    public $tax_1_share;
+    public $tax_2_share;
+    public $tax_3_share;
     public $update_time;
     
     // Deprecated
@@ -101,16 +94,9 @@ class Product implements InputFilterAwareInterface
         $this->property_9 = (isset($data['property_9'])) ? $data['property_9'] : null;
         $this->property_10 = (isset($data['property_10'])) ? $data['property_10'] : null;
         $this->variants = (isset($data['variants'])) ? json_decode($data['variants'], true) : array();
-        $this->vat_1_id = (isset($data['vat_1_id'])) ? $data['vat_1_id'] : null;
-        $this->vat_1_share = (isset($data['vat_1_share'])) ? $data['vat_1_share'] : null;
-        $this->vat_2_id = (isset($data['vat_2_id'])) ? $data['vat_2_id'] : null;
-        $this->vat_2_share = (isset($data['vat_2_share'])) ? $data['vat_2_share'] : null;
-        $this->vat_3_id = (isset($data['vat_3_id'])) ? $data['vat_3_id'] : null;
-        $this->vat_3_share = (isset($data['vat_3_share'])) ? $data['vat_3_share'] : null;
-        $this->vat_4_id = (isset($data['vat_4_id'])) ? $data['vat_4_id'] : null;
-        $this->vat_4_share = (isset($data['vat_4_share'])) ? $data['vat_4_share'] : null;
-        $this->vat_5_id = (isset($data['vat_5_id'])) ? $data['vat_5_id'] : null;
-        $this->vat_5_share = (isset($data['vat_5_share'])) ? $data['vat_5_share'] : null;
+        $this->tax_1_share = (isset($data['tax_1_share'])) ? $data['tax_1_share'] : null;
+        $this->tax_2_share = (isset($data['tax_2_share'])) ? $data['tax_2_share'] : null;
+        $this->tax_3_share = (isset($data['tax_3_share'])) ? $data['tax_3_share'] : null;
         $this->update_time = (isset($data['update_time'])) ? $data['update_time'] : array();
 
         // Deprecated
@@ -146,16 +132,9 @@ class Product implements InputFilterAwareInterface
     	$data['property_9'] = $this->property_9;
     	$data['property_10'] = $this->property_10;
 	    $data['variants'] = json_encode($this->variants);
-	    $data['vat_1_id'] = $this->vat_1_id;
-	    $data['vat_1_share'] = $this->vat_1_share;
-	    $data['vat_2_id'] = $this->vat_2_id;
-	    $data['vat_2_share'] = $this->vat_2_share;
-	    $data['vat_3_id'] = $this->vat_3_id;
-	    $data['vat_3_share'] = $this->vat_3_share;
-	    $data['vat_4_id'] = $this->vat_4_id;
-	    $data['vat_4_share'] = $this->vat_4_share;
-	    $data['vat_5_id'] = $this->vat_5_id;
-	    $data['vat_5_share'] = $this->vat_5_share;
+	    $data['tax_1_share'] = $this->tax_1_share;
+	    $data['tax_2_share'] = $this->tax_2_share;
+	    $data['tax_3_share'] = $this->tax_3_share;
 	     
 	    // Deprecated
     	$data['product_category_id'] = (int) $this->product_category_id;
@@ -172,7 +151,8 @@ class Product implements InputFilterAwareInterface
     	$select = Product::getTable()->getSelect();
     	 
     	$where = new Where();
-    
+    	$where->notEqualTo('md_product.status', 'deleted');
+
     	// Filter on type
     	if ($type) $where->equalTo('type', $type);
 
@@ -285,10 +265,10 @@ class Product implements InputFilterAwareInterface
 		return $products;
     }
 
-    public static function get($id)
+    public static function get($id, $column = 'id')
     {
-    	$product = Product::getTable()->get($id);
-    	$product->product_category = ProductCategory::get($product->product_category_id);
+    	$product = Product::getTable()->get($id, $column);
+//    	$product->product_category = ProductCategory::get($product->product_category_id);
 		
 		// Retrieve the available options for this product
 		$select = ProductOption::getTable()->getSelect()->where(array('product_id' => $product->id))

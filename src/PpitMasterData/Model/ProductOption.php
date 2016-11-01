@@ -101,7 +101,6 @@ class ProductOption implements InputFilterAwareInterface
     {
     	$context = Context::getCurrent();
     	$select = ProductOption::getTable()->getSelect();
-    	 
     	$where = new Where();
     	$where->notEqualTo('md_product_option.status', 'deleted');
     
@@ -142,10 +141,10 @@ class ProductOption implements InputFilterAwareInterface
     	return $options;
     }
     
-    public static function get($id)
+    public static function get($id, $column = 'id')
     {
-    	$productOption = ProductOption::getTable()->get($id);
-    	$productOption->product = Product::get($productOption->product_id);
+    	$productOption = ProductOption::getTable()->get($id, $column);
+    	if ($productOption->product_id) $productOption->product = Product::get($productOption->product_id);
     	return $productOption;
     }
 
