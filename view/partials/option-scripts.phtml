@@ -1,0 +1,128 @@
+function sortOptionList(type, product_id, criterion) {
+
+	var dir;
+	ascCriterion = $('.glyphicon-triangle-top').first().parent().attr('id');
+	descCriterion = $('.glyphicon-triangle-bottom').first().parent().attr('id');
+	if (criterion + '-anchor' == ascCriterion) dir = 'DESC'; else dir = 'ASC';
+	getOptionList(type, product_id, criterion, dir);
+}
+
+<?php 
+$properties = array();
+
+$properties['option-reference'] = array('type' => 'input', 'mandatory' => true, 'maxSize' => 255);
+$properties['option-caption'] = array('type' => 'input', 'mandatory' => true, 'maxSize' => 255);
+$properties['option-description'] = array('type' => 'input', 'mandatory' => false, 'maxSize' => 2047);
+$properties['option-is_available'] = array('type' => 'checkbox');
+$properties['option-variant-number'] = array('type' => 'hidden');
+$properties['option-price_0'] = array('type' => 'number', 'minValue' => -9999999999, 'maxValue' => 9999999999);
+$properties['option-vat_id'] = array('type' => 'select', 'mandatory' => true);
+$properties['update_time'] = array('type' => 'hidden');
+
+echo $this->partial('/partials/check-update-properties', array('entity' => 'Option', 'context' => $context, 'properties' => $properties)) 
+?>
+
+function connectOptionUpdateForm(type, product_id, id, action)
+{
+	// Check validity
+	var validity = checkOptionUpdateProperties(id);
+	if (validity) {
+	
+		// Create a new FormData object.
+		var formData = new FormData();
+		
+		// Get the properties values
+<?php foreach ($properties as $propertyId => $property) : ?>
+	<?php if ($property['type'] == 'input' || $property['type'] == 'date' || $property['type'] == 'textarea' || $property['type'] == 'select' || $property['type'] == 'repository' || $property['type'] == 'number' || $property['type'] == 'email' || $property['type'] == 'phone' || $property['type'] == 'hidden') : ?>
+			formData.append('<?php echo $propertyId ?>', document.getElementById('<?php echo $propertyId ?>').value);
+	<?php elseif ($property['type'] == 'checkbox') : ?>
+			formData.append('<?php echo $propertyId ?>', ((document.getElementById('<?php echo $propertyId ?>').checked) ? 1 : 0));
+	<?php endif ?>
+<?php endforeach ?>
+
+		var xhttp = new XMLHttpRequest();
+		var route, target;
+		route = '<?php echo $this->url('productOption/update') ?>/' + type + '/' + product_id + '/' + id;
+		if (action) route += '/' + action;
+		xhttp.open('POST', route, true);
+		// Set up a handler for when the request finishes.
+		xhttp.onload = function () {
+			if (xhttp.readyState == 4 <?php if (!$context->getConfig()['ppitCoreSettings']['isTraceActive']) echo '&& xhttp.status == 200' ?>) {
+				$('#option-update-panel_' + id).html(xhttp.responseText);
+				$('#option-remove-anchor_' + id).click(function () { getOptionList(type, product_id, '?', 'reference', 'ASC'); });
+				$('.action-btn').removeClass('btn-primary').addClass('btn-default');
+			}
+		};
+		xhttp.send(formData);
+	}
+	else return false;
+}
+
+function getOptionUpdate(type, product_id, id, action) {
+
+	var xhttp = new XMLHttpRequest();
+	var route = '<?php echo $this->url('productOption/update') ?>/' + type + '/' + product_id + '/' + id;
+	if (action) route += '/' + action;
+	xhttp.open('GET', route, true);
+	xhttp.onreadystatechange = function() {
+		if (xhttp.status == 401) location.href = '<?php echo $this->url('ppitUser/expired')?>';
+		if (xhttp.readyState == 4) {
+	<?php if (!$config['ppitCoreSettings']['isTraceActive']) : ?>
+			if (xhttp.status == 200) {
+	<?php endif;?>
+			$('.option-detail-anchor').removeClass('btn-primary').addClass('btn-default');
+			$('#option-detail-anchor_' + id).removeClass('btn-default').addClass('btn-primary');
+			$('.option-update-row').hide();
+			$('#option-update-row_' + id).show();
+			$('#option-update-panel_' + id).html(xhttp.responseText);
+			$('#option-remove-anchor_' + id).click(function () { 
+				$('.option-update-row').hide(); 
+				$('.option-detail-anchor').removeClass('btn-primary').addClass('btn-default');
+			});
+			$('#option-update-anchor').click(function () { getOptionUpdate(type, product_id, id, 'update'); });
+			$('#option-delete-anchor').click(function () { getOptionUpdate(type, product_id, id, 'delete'); });
+			$('#option-up-submit-button').click(function () { connectOptionUpdateForm(type, product_id, id, action); });
+			$('#option-submit-button').click(function () { connectOptionUpdateForm(type, product_id, id, action); });
+
+<?php if (!$config['ppitCoreSettings']['isTraceActive']) : ?>
+			}
+<?php endif;?>
+		}
+	}
+	xhttp.send();
+
+	// Highlight the clicked button (and only it in its class)
+	$('.action-btn').removeClass("btn-primary").addClass("btn-default");
+	if (action == 'update') $('#option-update-anchor').removeClass("btn-default").addClass("btn-primary");
+	else if (action == 'delete') $('#option-delete-anchor').removeClass("btn-default").addClass("btn-primary");
+}
+
+function getOptionList(type, product_id, params, major, dir) {		
+	route = '<?php echo $this->url('productOption/list') ?>/' + type + '/' + product_id + params + '&major=' + major + ((dir =='ASC') ? '&dir=ASC' : '&dir=DESC');
+	xhttp = new XMLHttpRequest();
+	xhttp.open("GET", route, true);
+	xhttp.onreadystatechange = function() {
+		if (xhttp.status == 401) location.href = '<?php echo $this->url('ppitUser/expired')?>';
+		if (xhttp.readyState == 4) {
+	<?php if (!$config['ppitCoreSettings']['isTraceActive']) : ?>
+			if (xhttp.status == 200) {
+	<?php endif;?>
+			$('#option-list-panel').html(xhttp.responseText);
+			$('.option-update-row').hide();
+			$('.ppit-sort-anchor').each(function () {
+				$(this).click(function () {
+					sortOptionList(type, product_id, $(this).attr('id').split('-')[0]);
+				});
+			});
+			$('.option-detail-anchor').each(function () {
+				$(this).click(function () {
+					getOptionUpdate(type, product_id, $(this).attr('id').split('_')[1], '');
+				});
+			});
+	<?php if (!$config['ppitCoreSettings']['isTraceActive']) : ?>
+			}
+	<?php endif;?>
+		}
+	}
+	xhttp.send();
+}

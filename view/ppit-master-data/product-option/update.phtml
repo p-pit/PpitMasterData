@@ -1,192 +1,164 @@
-<?php
-$spa = $context->isSpaMode();
-$anchorStyle = ($spa) ? $context->getAnchorStyle() : 'classic';
-$current = 'product';
-?>
+<div class="panel panel-default">
+	<div class="panel-heading" style="background: <?php echo $context->getConfig('styleSheet')['panelHeadingBackground'] ?>; color: <?php echo $context->getConfig('styleSheet')['panelHeadingColor'] ?>">
+		<strong><?php echo $this->translate('Option', 'ppit-core', $context->getLocale()).' '.$option->reference ?></strong>
+ 		<div class="btn-group pull-right">
+			<button type="button" class="btn btn-default option-remove-anchor" title="<?php echo $this->translate('Return to list', 'ppit-core', $context->getLocale()) ?>" id="option-remove-anchor_<?php echo $option->id ?>">
+				<span class="glyphicon glyphicon-remove"></span>
+			</button>
+ 		 </div>
+	</div>
+	<div class="panel-body">
 
-<!-- Display header on MPA mode -->
-<?php if (!$spa) : ?>
-	<?php 
-		$this->current = 'product';
-		echo $this->partial('/partials/menu'); 
-	?>
-<div class="row">
-    <div class="col-md-6 col-md-offset-3">
+<?php if (!$message && $option->id) : ?>
+		<button type="button" class="btn btn-default action-btn" id="option-update-anchor" title="<?php echo $this->translate('Update', 'ppit-core', $context->getLocale()) ?>">
+			<span class="glyphicon glyphicon-edit"></span>
+		</button>
+
+		<button type="button" class="btn btn-default action-btn" id="option-delete-anchor" title="<?php echo $this->translate('Delete', 'ppit-core', $context->getLocale()) ?>" <?php if (!$option->isDeletable()) echo 'disabled="disabled"' ?>>
+			<span class="glyphicon glyphicon-trash"></span>
+		</button>
 <?php endif;?>
 
-		<div class="panel panel-default">
-            <div class="panel-heading">
-				<?php echo $this->translate((($id) ? 'Update' : 'Add').' an option', 'ppit-master-data', $context->getLocale());?>
- 				<div class="btn-group pull-right">
-					<?php echo $this->partial('/partials/anchor-widget.phtml', array(
-							'glyphicon' => 'glyphicon-remove',
-							'title' => $this->translate('Return to list', 'ppit-core', $context->getLocale()),
-							'id' => 'remove-anchor',
-							'anchorStyle' => $anchorStyle,
-							'spa' => $spa,
-					)) ?>
-				</div>
-			</div>
-           	<div class="panel-body">
+<!-- Global message -->
+<?php if ($message == 'OK') : ?>
+		<div id="message">
+			<div class="alert alert-success"><h4><?php echo $this->translate('Your request have been registered', 'ppit-core', $context->getLocale()) ?></h4></div>
+		</div>
+<?php endif;?>
 
-<!-- Form header -->
-<?php echo $this->partial('/partials/form-header', array(
-			'id' => $id,
-			'update_time' => $productOption->update_time,
-			'message' => $message,
-			'error' => $error,
-			'csrfForm' => $csrfForm,
-			'context' => $context,
-)) ?>
+<!-- Duplicate error -->
+<?php if ($error == 'Duplicate') : ?>
+		<div class="form-group">
+			<div class="alert alert-danger"><p class="help-block"><?php echo $this->translate('This record already exist', 'ppit-core', $context->getLocale()) ?></p></div>
+		</div>
+<?php endif;?>
 
-<?php if ($message == 'OK') $isDisabled = true; else $isDisabled = false; ?>
+<!-- Isolation error -->
+		<input type="hidden" id="update_time" value="<?php echo $option->update_time ?>" />
+<?php if ($error == 'Isolation') : ?>
+		<div class="form-group">
+			<div class="alert alert-danger"><p class="help-block"><?php echo $this->translate('The database has evolved in the meantime, please input again', 'ppit-core', $context->getLocale()) ?></p></div>
+		</div>
+<?php endif;?>
 
-<!-- Reference -->
-<?php
-	echo $this->partial('/partials/input-widget.phtml', array(
-		'property' => 'reference',
-		'label' => $this->translate('Reference', 'ppit-master-data', $context->getLocale()),
-		'value' => $productOption->reference,
-		'isMandatory' => false,
-		'maxLength' => 255,
-		'context' => $context,
-		'isDisabled' => $isDisabled,
-)); ?>
+<!--  CSRF -->
+<?php $element = $csrfForm->get('csrf') ?>
+		<div class="form-group">
+			<?php echo $this->formElement($element) ?>
+<?php if ($this->formElementErrors($element)) : ?>
+			<div class="alert alert-danger"><p class="help-block"><?php echo $this->translate('The form has expired, please input again', 'ppit-core', $context->getLocale()) ?></p></div>
+<?php endif;?>
+		</div>
 
-<!-- Caption -->
-<?php
-	echo $this->partial('/partials/input-widget.phtml', array(
-		'property' => 'caption',
-		'label' => '* '.$this->translate('Caption', 'ppit-core', $context->getLocale()),
-		'value' => $productOption->caption,
-		'isMandatory' => true,
-		'maxLength' => 255,
-		'context' => $context,
-		'isDisabled' => $isDisabled,
-)); ?>
-					
-<!-- Description -->
-<?php echo $this->partial('/partials/textarea-widget.phtml', array(
-		'property' => 'description',
-		'label' => $this->translate('Description', 'ppit-core', $context->getLocale()),
-		'rows' => 3, 
-		'value' => $productOption->description,
-		'isMandatory' => false,
-		'maxLength' => 2047,
-		'context' => $context,
-		'isDisabled' => $isDisabled,
-)); ?>
-					
-<!-- Available ? -->
-<?php
-	echo $this->partial('/partials/checkbox-widget.phtml', array(
-		'property' => 'is_available',
-		'label' => $this->translate('Available ?', 'ppit-master-data', $context->getLocale()),
-		'value' => $productOption->is_available,
-		'context' => $context,
-		'isDisabled' => $isDisabled,
-)); ?>
-
-<!-- Prices -->
-<div class="form-group">
-	<label class="col-sm-5 control-label"><?php echo $this->translate('Price', 'ppit-master-data', $context->getLocale()) ?>:</label>
-	<div class="col-sm-7">&nbsp;</div>
-</div>
-<?php foreach ($config['ppitMasterDataSettings']['priceCategories'] as $category => $caption) : ?>
-	<?php echo $this->partial('/partials/number-widget.phtml', array(
-			'property' => 'price_'.$category,
-			'label' => '* '.$caption,
-			'value' => $productOption->prices[$category],
-			'isMandatory' => true,
-			'min' => 0.01,
-			'max' => 999999,
-			'context' => $context,
-			'isDisabled' => $isDisabled,
-	)); ?>
-<?php endforeach;?>
-
-<!-- Form footer -->
-<?php echo $this->partial('/partials/form-footer') ?>
-
+<?php if (!$option->id) : ?>
+	    <div class="form-group">
+			<div class="col-sm-5">&nbsp;</div>
+			<div class="col-sm-7">
+				<input type="submit" id="option-up-submit-button" class="btn btn-warning" value="<?php echo $this->translate('Add', 'ppit-core', $context->getLocale()) ?>">
 			</div>
 		</div>
-<?php if (!$spa) : ?>
+
+<?php elseif ($action == 'update') : ?>
+	    <div class="form-group">
+			<div class="col-sm-5">&nbsp;</div>
+			<div class="col-sm-7">
+				<input name="submit" type="submit" id="option-up-submit-button" class="btn btn-warning" value="<?php echo $this->translate('Update', 'ppit-core', $context->getLocale()) ?>">
+			</div>
+		</div>
+
+<?php elseif ($action == 'delete') : ?>
+	    <div class="form-group">
+			<div class="col-sm-5">&nbsp;</div>
+			<div class="col-sm-7">
+				<input name="submit" type="submit" id="option-up-submit-button" class="btn btn-danger" value="<?php echo $this->translate('Delete', 'ppit-core', $context->getLocale()) ?>">
+			</div>
+		</div>
+<?php endif;?>
+
+		<div>&nbsp;</div>
+
+<?php 
+if ($option->id && $action != 'update' || $message == 'OK') $isDisabled = true; else $isDisabled = false;
+?>
+
+		<div class="form-group" id="option-reference_group">
+			<label class="col-sm-5 control-label">* <?php echo $this->translate('Reference', 'ppit-core', $context->getLocale()) ?></label>
+			<div class="col-sm-7">
+				<input class="form-control" id="option-reference" value="<?php echo $option->reference ?>" <?php if ($isDisabled) echo 'disabled="disabled"'?> />
+			</div>
+			<div class="col-sm-12"><p class="help-block" id="option-reference_error"></p></div>
+		</div>
+
+		<div class="form-group" id="option-caption_group">
+			<label class="col-sm-5 control-label">* <?php echo $this->translate('Caption', 'ppit-core', $context->getLocale()) ?></label>
+			<div class="col-sm-7">
+				<input class="form-control" id="option-caption" value="<?php echo $option->caption ?>" <?php if ($isDisabled) echo 'disabled="disabled"'?> />
+			</div>
+			<div class="col-sm-12"><p class="help-block" id="option-caption_error"></p></div>
+		</div>
+
+		<div class="form-group" id="option-description_group">
+			<label class="col-sm-5 control-label"><?php echo $this->translate('Description', 'ppit-core', $context->getLocale()) ?></label>
+			<div class="col-sm-7">
+				<textarea class="form-control" id="option-description" <?php if ($isDisabled) echo 'disabled="disabled"'?>><?php echo $option->description ?></textarea>
+			</div>
+			<div class="col-sm-12"><p class="help-block" id="option-description_error"></p></div>
+		</div>
+
+		<div class="form-group" id="option-is_available_group">
+			<label class="col-sm-5 control-label"><?php echo $this->translate('Available ?', 'ppit-master-data', $context->getLocale()) ?></label>
+			<div class="col-sm-7">
+				<input type="checkbox" id="option-is_available" class="form-control" value="1"<?php if ($option->is_available) echo ' checked="checked"' ?><?php if (isset($isDisabled) && $isDisabled) echo ' disabled ="disabled"' ?>>
+			</div>
+			<div class="col-sm-12"><p class="help-block" id="option-is_available_error"></p></div>
+		</div>
+
+		<input type="hidden" id="option-variant-number" value="1" />
+		<input type="hidden" id="option-price_0" />
+		<div class="form-group" id="input_option-price_0_group">
+			<label class="col-sm-5 control-label">* <?php echo $this->translate('Price', 'ppit-master-data', $context->getLocale()) ?></label>
+			<div class="col-sm-7">
+				<input class="form-control" id="input_option-price_0" value="<?php echo $context->formatFloat($option->variants[0]['price'], 2) ?>" <?php if ($isDisabled) echo 'disabled="disabled"'?> />
+			</div>
+			<div class="col-sm-12"><p class="help-block" id="input_option-price_0_error"></p></div>
+		</div>
+
+		<div class="form-group" id="option-vat_id_group">
+			<label class="col-sm-5 control-label">* <?php echo $this->translate('Tax regime', 'ppit-master-data', $context->getLocale()) ?></label>
+			<div class="col-sm-7">
+				<select class="form-control" id="option-vat_id" <?php if ($isDisabled) echo 'disabled="disabled"'?>>
+	    			<option value="1" <?php if ($option->vat_id == '1') echo 'selected="selected"' ?>><?php echo $this->translate('Tax 1', 'ppit-master-data', $context->getLocale()) ?></option>
+	    			<option value="2" <?php if ($option->vat_id == '2') echo 'selected="selected"' ?>><?php echo $this->translate('Tax 2', 'ppit-master-data', $context->getLocale()) ?></option>
+	    			<option value="3" <?php if ($option->vat_id == '3') echo 'selected="selected"' ?>><?php echo $this->translate('Tax 3', 'ppit-master-data', $context->getLocale()) ?></option>
+	    			<option value="0" <?php if ($option->vat_id == '0') echo 'selected="selected"' ?>><?php echo $this->translate('Exempt', 'ppit-master-data', $context->getLocale()) ?></option>
+				</select>
+			</div>
+			<div class="col-sm-12"><p class="help-block" id="option-vat_id_error"></p></div>
+		</div>
+
+<?php if (!$option->id) : ?>
+		    <div class="form-group">
+				<div class="col-sm-5">&nbsp;</div>
+				<div class="col-sm-7">
+					<input name="submit" type="submit" id="option-submit-button" class="btn btn-warning" value="<?php echo $this->translate('Add', 'ppit-core', $context->getLocale()) ?>">
+				</div>
+			</div>
+
+<?php elseif ($action == 'update') : ?>
+		    <div class="form-group">
+				<div class="col-sm-5">&nbsp;</div>
+				<div class="col-sm-7">
+					<input name="submit" type="submit" id="option-submit-button" class="btn btn-warning" value="<?php echo $this->translate('Update', 'ppit-core', $context->getLocale()) ?>">
+				</div>
+			</div>
+
+<?php elseif ($action == 'delete') : ?>
+		    <div class="form-group">
+				<div class="col-sm-5">&nbsp;</div>
+				<div class="col-sm-7">
+					<input name="submit" type="submit" id="option-submit-button" class="btn btn-danger" value="<?php echo $this->translate('Delete', 'ppit-core', $context->getLocale()) ?>">
+				</div>
+			</div>
+<?php endif;?>
 	</div>
 </div>
-<?php endif;?>
-
-<!-- Load the common form javascript functions -->
-<?php echo $this->partial('/partials/common-form-js.phtml'); ?>
-
-<script id="product_option_update_script">
-
-<?php echo $this->partial('/partials/form-return-script', array(
-		'id' => 'remove-anchor',
-		'route' => $this->url('productOption/index', array('product_id' => $productOption->product_id)),
-		'spa' => $spa,
-)) ?>
-
-<?php if ($message == 'OK') : ?>
-
-<?php echo $this->partial('/partials/form-return-script', array(
-		'id' => 'foot-return-anchor',
-		'route' => $this->url('productOption/index', array('product_id' => $productOption->product_id)),
-		'spa' => $spa,
-)) ?>
-
-<?php else : ?>
-
-<?php echo $this->partial('/partials/form-return-script', array(
-		'id' => 'cancel-anchor',
-		'route' => $this->url('productOption/index', array('product_id' => $productOption->product_id)),
-		'spa' => $spa,
-)) ?>
-
-// Submit
-<?php
-$properties = array(
-		'reference' => 'input',
-		'caption' => 'input',
-		'description' => 'input',
-		'is_available' => 'checkbox',
-		'update_time' => 'hidden',
-);
-// Add prices
-foreach ($config['ppitMasterDataSettings']['priceCategories'] as $category => $caption) {
-	$properties['price_'.$category] = 'input';
-}
-echo $this->partial('/partials/form-button-script', array(
-		'context' => $context,
-		'id' => 'submit-button',
-		'checkFunction' => 'checkForm',
-		'formRoute' => $this->url('productOption/update', array('product_id' => $product_id, 'id' => $id)),
-		'formScript' =>'product_option_update_script',
-		'properties' => $properties,
-		'mainRoute' => $this->url('productOption/index', array('product_id' => $productOption->product_id)),
-		'mainScript' =>'product_script',
-		'hideForm' => false,
-)) ?>
-
-<?php endif;?>
-
-// The elements are checked last to first so the focus is positionned on the first element on error
-function checkForm() 
-{
-	var validity = true;	
-
-// Prices
-<?php foreach ($config['ppitMasterDataSettings']['priceCategories'] as $category => $caption) : ?>
-	if (!check_price_<?php echo $category ?>()) validity = false;
-<?php endforeach;?>
-
-// Description
-if (!check_description()) validity = false;
-
-// Caption
-if (!check_caption()) validity = false;
-
-// Reference
-if (!check_reference()) validity = false;
-}
-
-</script>

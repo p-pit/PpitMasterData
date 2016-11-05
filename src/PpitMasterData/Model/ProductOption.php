@@ -12,6 +12,7 @@ class ProductOption implements InputFilterAwareInterface
 {
     public $id;
     public $status;
+    public $type;
     public $product_id;
     public $reference;
     public $caption;
@@ -40,9 +41,9 @@ class ProductOption implements InputFilterAwareInterface
     {
     	$config = Context::getCurrent()->getConfig();
     	$this->prices = array();
-    	foreach ($config['ppitMasterDataSettings']['priceCategories'] as $category => $caption) {
+/*    	foreach ($config['ppitMasterDataSettings']['priceCategories'] as $category => $caption) {
     		$this->prices[$category] = '';
-    	}
+    	}*/
     }
 
     public function getArrayCopy()
@@ -54,6 +55,7 @@ class ProductOption implements InputFilterAwareInterface
     {
         $this->id = (isset($data['id'])) ? $data['id'] : null;
         $this->status = (isset($data['status'])) ? $data['status'] : null;
+        $this->type = (isset($data['type'])) ? $data['type'] : null;
         $this->product_id = (isset($data['product_id'])) ? $data['product_id'] : null;
         $this->reference = (isset($data['reference'])) ? $data['reference'] : null;
         $this->caption = (isset($data['caption'])) ? $data['caption'] : null;
@@ -75,6 +77,7 @@ class ProductOption implements InputFilterAwareInterface
     	$data = array();
     	$data['id'] = (int) $this->id;
     	$data['status'] = $this->status;
+    	$data['type'] = $this->type;
     	$data['product_id'] = (int) $this->product_id;
     	$data['reference'] = $this->reference;
     	$data['caption'] = $this->caption;
@@ -89,34 +92,31 @@ class ProductOption implements InputFilterAwareInterface
     	return $data;
     }
 
-    public static function instanciate($product_id = null)
+    public static function instanciate($type = null, $product_id = null)
     {
     	$productOption = new ProductOption;
+    	$productOption->id = 0;
+    	$productOption->status = 'new';
+    	$productOption->type = $type;
     	$productOption->product_id = $product_id;
     	if ($product_id) $productOption->product = Product::get($product_id);
+    	$productOption->is_available = true;
     	return $productOption;
     }
 
-    public static function getList($params, $major = 'reference', $dir = 'ASC', $mode = 'search')
+    public static function getList($type, $params, $major = 'reference', $dir = 'ASC', $mode = 'search')
     {
     	$context = Context::getCurrent();
     	$select = ProductOption::getTable()->getSelect();
     	$where = new Where();
     	$where->notEqualTo('md_product_option.status', 'deleted');
-    
+
+    	// Filter on type
+    	if ($type) $where->equalTo('type', $type);
+
     	// Todo list vs search modes
     	if ($mode == 'todo') {
-/*    
-    		$todo = $context->getConfig('commitment'.(($type) ? '/'.$type : ''))['todo'];
-    		foreach($todo as $role => $properties) {
-    			if ($context->hasRole($role)) {
-    				foreach($properties as $property => $predicate) {
-    					if ($predicate['selector'] == 'equalTo') $where->equalTo('commitment.'.$property, $predicate['value']);
-    					elseif ($predicate['selector'] == 'in') $where->in('commitment.'.$property, $predicate['value']);
-    					elseif ($predicate['selector'] == 'deadline') $where->lessThanOrEqualTo('commitment.'.$property, date('Y-m-d', strtotime(date('Y-m-d').'+ '.$predicate['value'].' days')));
-    				}
-    			}
-    		}*/
+    		$where->equalTo('is_available', 1);
     	}
     	else {
     
@@ -129,8 +129,8 @@ class ProductOption implements InputFilterAwareInterface
     	}
     
     	// Sort the list
-    	$select->where($where)->order(array($major.' '.$dir, 'reference'));
-    
+    	$select->where($where)->order(array(($major) ? $major.' '.$dir : 'caption', 'caption'));
+    	
     	$cursor = ProductOption::getTable()->selectWith($select);
     	$options = array();
     	foreach ($cursor as $option) {
@@ -144,7 +144,7 @@ class ProductOption implements InputFilterAwareInterface
     public static function get($id, $column = 'id')
     {
     	$productOption = ProductOption::getTable()->get($id, $column);
-    	if ($productOption->product_id) $productOption->product = Product::get($productOption->product_id);
+    	if ($productOption && $productOption->product_id) $productOption->product = Product::get($productOption->product_id);
     	return $productOption;
     }
 
@@ -152,26 +152,34 @@ class ProductOption implements InputFilterAwareInterface
     {
     	$config = Context::getCurrent()->getConfig();
     	
-    	$this->status = trim(strip_tags($data['status']));
-    	$this->reference = trim(strip_tags($data['reference']));
-    	$this->caption = trim(strip_tags($data['caption']));
-    	$this->description = trim(strip_tags($data['description']));
-    	$this->is_available = (int)$data['is_available'];
-    
-    	if ($this->status == '' || strlen($this->status) > 255) return 'Integrity';
-    	if ($this->reference == '' || strlen($this->reference) > 255) return 'Integrity';
-    	if ($this->caption == '' || strlen($this->caption) > 255) return 'Integrity';
-    	if (strlen($this->description) > 2047) return 'Integrity';
-    
-    	// Prices
-    	foreach ($config['ppitMasterDataSettings']['priceCategories'] as $category => $caption) {
-    		$this->prices[$category] = (float) $data['price_'.$category];
+        if (array_key_exists('status', $data)) {
+	    	$this->status = trim(strip_tags($data['status']));
+    		if (!$this->status || strlen($this->status) > 255) return 'Integrity';
     	}
-    	
+        if (array_key_exists('type', $data)) {
+	    	$this->type = trim(strip_tags($data['type']));
+        	if (!$this->type || strlen($this->type) > 255) return 'Integrity';
+    	}
+        if (array_key_exists('reference', $data)) {
+    		$this->reference = trim(strip_tags($data['reference']));
+            if (!$this->reference || strlen($this->reference) > 255) return 'Integrity';
+    	}
+        if (array_key_exists('caption', $data)) {
+    		$this->caption = trim(strip_tags($data['caption']));
+    		if (!$this->caption || strlen($this->caption) > 255) return 'Integrity';
+    	}
+        if (array_key_exists('description', $data)) {
+    		$this->description = trim(strip_tags($data['description']));
+    		if (strlen($this->description) > 2047) return 'Integrity';
+    	}
+        if (array_key_exists('is_available', $data)) $this->is_available = (int) $data['is_available'];
+        if (array_key_exists('variants', $data)) $this->variants = $data['variants'];
+        if (array_key_exists('vat_id', $data)) $this->vat_id = (int) $data['vat_id'];
+        
     	// Check consistency
-    	$select = ProductOption::getTable()->getSelect()->where(array('reference' => $this->reference));
+/*    	$select = ProductOption::getTable()->getSelect()->where(array('reference' => $this->reference));
     	$cursor = ProductOption::getTable()->selectWith($select);
-    	if (count($cursor) > 0 && $cursor->current()->id != $this->id) return 'Duplicate';
+    	if (count($cursor) > 0 && $cursor->current()->id != $this->id) return 'Duplicate';*/
 
     	return 'OK';
     }

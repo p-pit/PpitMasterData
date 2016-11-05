@@ -1,0 +1,52 @@
+		<table class="table table-striped ppit_index">
+			<tr>
+				<th>&nbsp;</th>
+				<th align="center">
+					<button type="button" class="btn btn-default btn-xs ppit-sort-anchor" id="reference-anchor">
+						<span><?php echo $this->translate('Reference', 'ppit-master-data', $context->getLocale()) ?></span>
+<?php if ($major == 'reference') : ?>
+						<span class="glyphicon glyphicon-triangle-<?php echo ($dir == 'ASC') ? 'top' : 'bottom' ?>"></span>
+<?php endif ?>
+					</button>
+				</th>
+				<th align="center">
+					<button type="button" class="btn btn-default btn-xs ppit-sort-anchor" id="caption-anchor">
+						<span><?php echo $this->translate('Caption', 'ppit-core', $context->getLocale()) ?></span>
+<?php if ($major == 'caption') : ?>
+						<span class="glyphicon glyphicon-triangle-<?php echo ($dir == 'ASC') ? 'top' : 'bottom' ?>"></span>
+<?php endif ?>
+					</button>
+				</th>
+			</tr>
+				
+			<tr>
+				<td colspan="3">
+					<button type="button" class="btn btn-default index-btn option-detail-anchor" title="<?php echo $this->translate('Detail', 'ppit-core', $context->getLocale())?>" id="option-detail-anchor_0">
+						<span class="glyphicon glyphicon-plus" id="add-glyphicon"></span>
+					</button>
+				</td>
+			</tr>
+			
+			<tr class="option-update-row" id="option-update-row_0">
+				<td colspan="3"><div id="option-update-panel_0"></div></td>
+			</tr>
+			
+<?php foreach ($options as $option) : ?>
+	<?php if ($context->isAllowed('productOption/update')) : ?>
+			
+			<tr class="option"  <?php if (!$option->is_available) echo 'style="font-style: italic"' ?>>
+				<td >
+					<button type="button" class="btn btn-default index-btn option-detail-anchor" title="<?php echo $this->translate('Detail', 'ppit-core', $context->getLocale())?>" id="option-detail-anchor_<?php echo $option->id ?>">
+						<span class="glyphicon glyphicon-zoom-in" id="<?php echo $product->id ?>-glyphicon"></span>
+					</button>
+				</td>
+				<td><?php echo $option->reference ?></td>
+				<td><?php echo $option->caption ?></td>
+			</tr>
+			
+			<tr class="option-update-row" id="option-update-row_<?php echo $option->id ?>">
+				<td colspan="3"><div id="option-update-panel_<?php echo $option->id ?>"></div></td>
+			</tr>
+	<?php endif;?>
+<?php endforeach; ?>		
+		</table>

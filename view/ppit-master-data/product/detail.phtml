@@ -1,6 +1,7 @@
 <div class="panel panel-default">
 	<div class="panel-heading" style="background: <?php echo $context->getConfig('styleSheet')['panelHeadingBackground'] ?>; color: <?php echo $context->getConfig('styleSheet')['panelHeadingColor'] ?>">
-		<strong><?php echo $this->translate('Detail', 'ppit-core', $context->getLocale()) ?></strong>
+		<strong id="product-title"><?php echo $this->translate('Product', 'ppit-master-data', $context->getLocale()).' '.$product->reference ?></strong>
+		<strong id="option-title"><?php echo $this->translate('Global options', 'ppit-master-data', $context->getLocale()) ?></strong>
  		<div class="btn-group pull-right">
 			<button type="button" class="btn btn-default" title="<?php echo $this->translate('Return to list', 'ppit-core', $context->getLocale()) ?>" id="remove-anchor">
 				<span class="glyphicon glyphicon-remove"></span>
@@ -8,7 +9,20 @@
  		 </div>
 	</div>
 	<div class="panel-body">
-		<span>A compléter</span>
-	</div>
 
-	<div id="product-update-panel"></div>
+<?php if ($product->id) : ?>
+		<button type="button" class="btn btn-default action-btn" id="product-update-anchor" title="<?php echo $this->translate('Update', 'ppit-core', $context->getLocale()) ?>">
+			<span class="glyphicon glyphicon-edit"></span>
+		</button>
+
+		<button type="button" class="btn btn-default action-btn" id="product-delete-anchor" title="<?php echo $this->translate('Delete', 'ppit-core', $context->getLocale()) ?>" <?php if (!$product->isDeletable()) echo 'disabled="disabled"' ?>>
+			<span class="glyphicon glyphicon-trash"></span>
+		</button>
+<?php endif;?>
+
+		<div id="product-update-panel"></div>
+
+		<input type="hidden" id="product_id" value="<?php echo $product->id ?>" />
+		<div id="option-list-panel"></div>
+	</div>
+</div

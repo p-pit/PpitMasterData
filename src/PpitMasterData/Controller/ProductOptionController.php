@@ -131,173 +131,125 @@ class ProductOptionController extends AbstractActionController
    		if ($context->isSpaMode()) $view->setTerminal(true);
    		return $view;
     }
-/*
-    public function addAction()
+
+    public function getList()
     {
-        // Check that a product has been given
-    	$id = (int) $this->params()->fromRoute('id', 0);
-    	if (!$id) {
-    		return $this->redirect()->toRoute('index');
-    	}
-    	// Retrieve the context
-    	$context = new COntext;
-
-    	// Retrieve the product
-    	$product = Product::getTable()->get($id);
-
-    	$productOption = new ProductOption();
-    	$productOption->product_id = $id;
-    	$productOption->is_available = true;
-    	 
-    	$csrfForm = new CsrfForm();
-    	$csrfForm->addCsrfElement('csrf');
-    	$error = null;
-    	$request = $this->getRequest();
-    	if ($request->isPost()) {
-    		$csrfForm->setInputFilter((new Csrf('csrf'))->getInputFilter());
-    		$csrfForm->setData($request->getPost());
+    	$context = Context::getCurrent();
+    	$type = $this->params()->fromRoute('type', null);
+    	$product_id = (int) $this->params()->fromRoute('product_id', 0);
+    	$params = array('product_id' => $product_id);
+    	$major = ($this->params()->fromQuery('major', 'caption'));
+    	$dir = ($this->params()->fromQuery('dir', 'ASC'));
+    	$mode = 'search';
     
-    		if ($csrfForm->isValid()) { // CSRF check
-    			$productOption->reference = $request->getPost('reference');
-    			$productOption->caption = $request->getPost('caption');
-    			$productOption->description = $request->getPost('description');
-    			$productOption->is_available = $request->getPost('is_available');
-    			$productOption->checkIntegrity();
-    			 
-    			// Check for duplicate data
-    			$select = ProductOption::getTable()->getSelect()
-	    			->where(array('product_id' => $product->id, 'reference' => $productOption->reference));
-    			$cursor = ProductOption::getTable()->selectWith($select);
-    			if (count($cursor) > 0) $error = 'Duplicate';
-    			else {
-    				ProductOption::getTable()->save($productOption);
+    	// Retrieve the list
+    	$options = ProductOption::getList($type, $params, $major, $dir, $mode);
     
-    				// Redirect
-    				return $this->redirect()->toRoute('productOption/index', array('id' => $product->id));
-    			}
-    		}
-    	}
-    	return array(
+    	// Return the link list
+    	$view = new ViewModel(array(
     			'context' => $context,
-				'config' => $context->getconfig(),
-    			'id' => $id,
-    			'product' => $product,
-    			'productOption' => $productOption,
-    			'csrfForm' => $csrfForm,
-    			'error' => $error
-    	);
-    }*/
+    			'config' => $context->getconfig(),
+    			'type' => $type,
+    			'options' => $options,
+    			'mode' => $mode,
+    			'params' => $params,
+    			'major' => $major,
+    			'dir' => $dir,
+    	));
+    	$view->setTerminal(true);
+    	return $view;
+    }
     
+    public function listAction()
+    {
+    	return $this->getList();
+    }
+    
+    public function exportAction()
+    {
+    	return $this->getList();
+    }
+
     public function updateAction()
     {
-    	$product_id = (int) $this->params()->fromRoute('product_id', 0);
-    	if (!$product_id) {
-    		return $this->redirect()->toRoute('index');
-    	}
     	// Retrieve the context
     	$context = Context::getCurrent();
 
-    	// Retrieve or create the option
+    	$type = $this->params()->fromRoute('type', null);
+    	$product_id = (int) $this->params()->fromRoute('product_id', 0);
+
     	$id = (int) $this->params()->fromRoute('id', 0);
-    	if ($id) $productOption = ProductOption::get($id);
-    	else $productOption = ProductOption::instanciate($product_id);
+    	if ($id) $option = ProductOption::get($id);
+    	else $option = ProductOption::instanciate($type, $product_id);
+    	
+    	$action = $this->params()->fromRoute('act', null);
     
     	$csrfForm = new CsrfForm();
     	$csrfForm->addCsrfElement('csrf');
-    	$message = null;
     	$error = null;
+    	if ($action == 'delete') $message = 'confirm-delete';
+    	elseif ($action) $message =  'confirm-update';
+    	else $message = null;
     	$request = $this->getRequest();
     	if ($request->isPost()) {
+    		$message = null;
     		$csrfForm->setInputFilter((new Csrf('csrf'))->getInputFilter());
     		$csrfForm->setData($request->getPost());
     		
     		if ($csrfForm->isValid()) { // CSRF check
-    		    $return = $productOption->loadDataFromRequest($request);
-
-				if ($return != 'OK') $error = $return;
-    			else {
-    			
-	    			// Atomicity
-	    			$connection = ProductOption::getTable()->getAdapter()->getDriver()->getConnection();
-	    			$connection->beginTransaction();
-	    			try {
-			    		// Add or update
-	    				if (!$id) $return = $productOption->add();
-	    				else $return = $productOption->update($request->getPost('update_time'));
-	   					if ($return != 'OK') {
-		    				$connection->rollback();
-							$error = $return;
-						}
-						else {
-							$connection->commit();
-							$message = $return;
-						}
-	    			}
-	           	    catch (\Exception $e) {
-		    			$connection->rollback();
-		    			throw $e;
-		    		}
+    			$data = array();
+    			$data['type'] = $type;
+    			$data['reference'] = $request->getPost(('option-reference'));
+    			$data['caption'] = $request->getPost(('option-caption'));
+    			$data['description'] = $request->getPost(('option-description'));
+    			$data['is_available'] = $request->getPost(('option-is_available'));
+    			$variantNumber = $request->getPost('option-variant-number');
+    			$data['variants'] = array();
+    			for ($i = 0; $i < $variantNumber; $i++) {
+    				$variant = array('price' => $request->getPost('option-price_'.$i));
+    				$data['variants'][] = $variant;
     			}
+    			$data['vat_id'] = $request->getPost(('option-vat_id'));
+    			if ($option->loadData($data) != 'OK') throw new \Exception('Integrity');
+    			// Atomicity
+    			$connection = ProductOption::getTable()->getAdapter()->getDriver()->getConnection();
+    			$connection->beginTransaction();
+    			try {
+					if (!$option->id) $rc = $option->add();
+	    			elseif ($action == 'delete') {
+	    				$option->status = 'deleted';
+	    				$rc = $option->update($request->getPost('update_time'));
+	    			}
+	    			else {
+    					$rc = $option->update($request->getPost('update_time'));
+	    			}
+    				if ($rc != 'OK') $error = $rc;
+	    			if ($error) $connection->rollback();
+					else {
+						$connection->commit();
+						$message = 'OK';
+					}
+    			}
+           	    catch (\Exception $e) {
+	    			$connection->rollback();
+	    			throw $e;
+	    		}
+			    $action = null;
     		}
     	}
     	$view = new ViewModel(array(
     			'context' => $context,
 				'config' => $context->getconfig(),
+    			'type' => $type,
     			'product_id' => $product_id,
     			'id' => $id,
-    			'productOption' => $productOption,
+    			'action' => $action,
+    			'option' => $option,
     			'csrfForm' => $csrfForm,
     			'message' => $message,
     			'error' => $error
     	));
-   		if ($context->isSpaMode()) $view->setTerminal(true);
-   		return $view;
-    }
-    
-    public function deleteAction()
-    {
-    	$id = (int) $this->params()->fromRoute('id', 0);
-    	if (!$id) {
-    		return $this->redirect()->toRoute('index');
-    	}
-    	// Retrieve the current user
-    	$context = Context::getCurrent();
-    
-    	// Retrieve the data to delete
-    	$productOption = ProductOption::getTable()->get($id);
-
-    	// Retrieve the product
-    	$product = Product::getTable()->get($productOption->product_id);
-    	 
-    	$csrfForm = new CsrfForm();
-    	$csrfForm->addCsrfElement('csrf');
-    	$message = null;
-    	$error = null;
-    	$request = $this->getRequest();
-    	if ($request->isPost()) {
-    
-    		$csrfForm->setInputFilter((new Csrf('csrf'))->getInputFilter());
-    		$csrfForm->setData($request->getPost());
-    
-    		if ($csrfForm->isValid()) {
-    	   
-    			// Delete the row
-    			ProductOption::getTable()->delete($id);
-    			 
-				$message = 'OK';
-    		}
-    	}
-    	$view = new ViewModel(array(
-    			'context' => $context,
-				'config' => $context->getconfig(),
-    			'product' => $product,
-    			'id' => $id,
-    			'productOption' => $productOption,
-    			'csrfForm' => $csrfForm,
-    			'message' => $message,
-    			'error' => $error
-    	));
-   		if ($context->isSpaMode()) $view->setTerminal(true);
+   		$view->setTerminal(true);
    		return $view;
     }
 }

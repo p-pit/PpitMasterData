@@ -62,9 +62,9 @@ class Product implements InputFilterAwareInterface
     	$config = Context::getCurrent()->getConfig();
     	$this->properties = array();
     	$this->prices = array();
-    	foreach ($config['ppitMasterDataSettings']['priceCategories'] as $category => $caption) {
+/*    	foreach ($config['ppitMasterDataSettings']['priceCategories'] as $category => $caption) {
     		$this->prices[$category] = '';
-    	}
+    	}*/
     }
 
     public function getArrayCopy()
@@ -158,16 +158,7 @@ class Product implements InputFilterAwareInterface
 
     	// Todo list vs search modes
     	if ($mode == 'todo') {
-    		$todo = $context->getConfig('ppitProduct')['todo'];
-    		foreach($todo as $role => $properties) {
-    			if ($context->hasRole($role)) {
-    				foreach($properties as $property => $predicate) {
-    					if ($predicate['selector'] == 'equalTo') $where->equalTo($property, $predicate['value']);
-    					elseif ($predicate['selector'] == 'in') $where->in($property, $predicate['value']);
-    					elseif ($predicate['selector'] == 'deadline') $where->lessThanOrEqualTo($property, date('Y-m-d', strtotime(date('Y-m-d').'+ '.$predicate['value'].' days')));
-    				}
-    			}
-    		}
+    		$where->equalTo('is_available', 1);
     	}
     	else {
     			
@@ -186,7 +177,7 @@ class Product implements InputFilterAwareInterface
     	}
     
     	// Sort the list
-    	$select->where($where)->order(array($major.' '.$dir, 'caption'));
+    	$select->where($where)->order(array(($major) ? $major.' '.$dir : 'caption', 'caption'));
     	$cursor = Product::getTable()->selectWith($select);
     	$products = array();
     	foreach ($cursor as $product) {
@@ -216,6 +207,9 @@ class Product implements InputFilterAwareInterface
     public static function instanciate()
     {
 		$product = new Product;
+		$product->id = 0;
+		$product->status = 'new';
+		$product->is_available = true;
 		return $product;
     }
 
@@ -297,38 +291,58 @@ class Product implements InputFilterAwareInterface
     	$config = Context::getCurrent()->getConfig();
 
     	// Retrieve the data from the request
-    	$this->status = trim(strip_tags($data['status']));
-    	$this->brand = trim(strip_tags($data['brand']));
-    	$this->reference = trim(strip_tags($data['reference']));
-    	$this->caption = trim(strip_tags($data['caption']));
-    	$this->description = trim(strip_tags($data['description']));
-    	$this->is_available = (int) $data['is_available'];
+    	if (array_key_exists('status', $data)) {
+	    	$this->status = trim(strip_tags($data['status']));
+    		if (!$this->status || strlen($this->status) > 255) return 'Integrity';
+    	}
+        if (array_key_exists('type', $data)) {
+	    	$this->type = trim(strip_tags($data['type']));
+    		if (!$this->type || strlen($this->type) > 255) return 'Integrity';
+    	}
+        if (array_key_exists('brand', $data)) {
+    		$this->brand = trim(strip_tags($data['brand']));
+        	if (!$this->brand || strlen($this->brand) > 255) return 'Integrity';
+    	}
+        if (array_key_exists('reference', $data)) {
+		    $this->reference = trim(strip_tags($data['reference']));
+            if (!$this->reference || strlen($this->reference) > 255) return 'Integrity';
+    	}
+        if (array_key_exists('caption', $data)) {
+	    	$this->caption = trim(strip_tags($data['caption']));
+        	if (!$this->caption || strlen($this->caption) > 255) return 'Integrity';
+    	}
+        if (array_key_exists('description', $data)) {
+	    	$this->description = trim(strip_tags($data['description']));
+        	if (strlen($this->description) > 2047) return 'Integrity';
+    	}
+        if (array_key_exists('is_available', $data)) $this->is_available = (int) $data['is_available'];
     
     	// Properties
-    	$this->properties = array();
-        foreach ($this->product_category->properties as $property => $definition) {
-    		$this->properties[$property] = $data['property_'.$property];
-    	}
+        if (array_key_exists('property_1', $data)) $this->property_1 = $data['property_1'];
+        if (array_key_exists('property_2', $data)) $this->property_2 = $data['property_2'];
+        if (array_key_exists('property_3', $data)) $this->property_3 = $data['property_3'];
+        if (array_key_exists('property_4', $data)) $this->property_4 = $data['property_4'];
+        if (array_key_exists('property_5', $data)) $this->property_5 = $data['property_5'];
+        if (array_key_exists('property_6', $data)) $this->property_6 = $data['property_6'];
+        if (array_key_exists('property_7', $data)) $this->property_7 = $data['property_7'];
+        if (array_key_exists('property_8', $data)) $this->property_8 = $data['property_8'];
+        if (array_key_exists('property_9', $data)) $this->property_9 = $data['property_9'];
+        if (array_key_exists('property_10', $data)) $this->property_10 = $data['property_10'];
+        
+    	// Variants
+        if (array_key_exists('variants', $data)) $this->variants = $data['variants'];
 
-    	// Prices
-    	foreach ($config['ppitMasterDataSettings']['priceCategories'] as $category => $caption) {
-    		$this->prices[$category] = (float) $data['price_'.$category];
-    	}
+        if (array_key_exists('tax_1_share', $data)) $this->tax_1_share = (float) $data['tax_1_share'];
+        if (array_key_exists('tax_2_share', $data)) $this->tax_2_share = (float) $data['tax_2_share'];
+        if (array_key_exists('tax_3_share', $data)) $this->tax_3_share = (float) $data['tax_3_share'];
 
-    	// Check integrity
-    	if ($this->brand == '' || strlen($this->brand) > 255) return 'Integrity';
-    	if (strlen($this->reference) > 255) return 'Integrity';
-    	if ($this->caption == '' || strlen($this->caption) > 255) return 'Integrity';
-    	if (strlen($this->description) > 2047) return 'Integrity';
-    	
     	// Check consistency
-    	$select = Product::getTable()->getSelect()->where(array('brand' => $this->brand, 'reference' => $this->reference));
+/*    	$select = Product::getTable()->getSelect()->where(array('brand' => $this->brand, 'reference' => $this->reference));
     	$cursor = Product::getTable()->selectWith($select);
-    	if (count($cursor) > 0 && $cursor->current()->id != $this->id) return 'Duplicate';
-
+    	if (count($cursor) > 0 && $cursor->current()->id != $this->id) return 'Duplicate';*/
     	return 'OK';
     }
-
+/*
     public function loadDataFromRequest($request) {
     	$config = Context::getCurrent()->getConfig();
     	$data = array();
@@ -351,7 +365,7 @@ class Product implements InputFilterAwareInterface
     	$return = $this->loadData($data);
     	if ($return == 'Integrity') throw new \Exception('View error');
 		return $return;
-    }
+    }*/
 
     public function add()
     {
@@ -362,7 +376,7 @@ class Product implements InputFilterAwareInterface
     public function update($update_time)
     {
 		$product = Product::getTable()->get($this->id);
-		if ($product->update_time > $update_time) return 'Isolation';
+		if ($update_time && $product->update_time > $update_time) return 'Isolation';
 		Product::getTable()->save($this);
 		return 'OK';
     }
@@ -382,7 +396,7 @@ class Product implements InputFilterAwareInterface
     	if ($product->update_time > $update_time) return 'Isolation';
     	
     	// Delete options related to the product
-    	ProductOption::getTable()->multipleDelete(array('product_id' => $this->product_id));
+    	ProductOption::getTable()->multipleDelete(array('product_id' => $this->id));
     	
     	// Delete the product
     	Product::getTable()->delete($this->id);

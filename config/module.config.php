@@ -192,11 +192,11 @@ return array(
 	       			'update' => array(
 	                    'type' => 'segment',
 	                    'options' => array(
-	                        'route' => '/update[/:id]',
-		                    'constraints' => array(
-		                    	'id'     => '[0-9]*',
-		                    ),
-	                    	'defaults' => array(
+        						'route' => '/update[/:type][/:id][/:act]',
+        						'constraints' => array(
+        								'id'     => '[0-9]*',
+        						),
+	                    		'defaults' => array(
 	                            'action' => 'update',
 	                        ),
 	                    ),
@@ -298,9 +298,8 @@ return array(
         						'update' => array(
         								'type' => 'segment',
         								'options' => array(
-        										'route' => '/update[/:product_category_id][/:id]',
+        										'route' => '/update[/:type][/:id][/:act]',
         										'constraints' => array(
-        												'product_category_id' => '[0-9]*',
         												'id'     => '[0-9]*',
         										),
         										'defaults' => array(
@@ -413,22 +412,34 @@ return array(
         										),
         								),
         						),
-/*        						'add' => array(
+        						'list' => array(
         								'type' => 'segment',
         								'options' => array(
-        										'route' => '/add[/:id]',
+        										'route' => '/list[/:type][/:product_id]',
         										'constraints' => array(
-        												'id'     => '[0-9]*',
+        												'product_id' => '[0-9]*',
         										),
         										'defaults' => array(
-        												'action' => 'add',
+        												'action' => 'list',
         										),
         								),
-        						),*/
+        						),
+        						'export' => array(
+        								'type' => 'segment',
+        								'options' => array(
+        										'route' => '/export[/:type][/:product_id]',
+        										'constraints' => array(
+        												'product_id' => '[0-9]*',
+        										),
+        										'defaults' => array(
+        												'action' => 'export',
+        										),
+        								),
+        						),
         						'update' => array(
         								'type' => 'segment',
         								'options' => array(
-        										'route' => '/update[/:product_id][/:id]',
+        										'route' => '/update[/:type][/:product_id][/:id][/:act]',
         										'constraints' => array(
         												'product_id' => '[0-9]*',
         												'id' => '[0-9]*',
@@ -438,25 +449,8 @@ return array(
         										),
         								),
         						),
-        						'delete' => array(
-        								'type' => 'segment',
-        								'options' => array(
-        										'route' => '/delete[/:id]',
-        										'constraints' => array(
-        												'id'     => '[0-9]*',
-        										),
-        										'defaults' => array(
-        												'action' => 'delete',
-        										),
-        								),
-        						),
-        				),),
-        		
-        		
-        		
-        		
-        		
-        		
+        				),
+        		),
         ),
     ),
 	
@@ -489,6 +483,7 @@ return array(
 				// Product
 				array('route' => 'product', 'roles' => array('user')),
 				array('route' => 'product/index', 'roles' => array('user')),
+				array('route' => 'product/list', 'roles' => array('user')),
 				array('route' => 'product/criteria', 'roles' => array('guest')),
 				array('route' => 'product/restList', 'roles' => array('guest')),
 				array('route' => 'product/search', 'roles' => array('user')),
@@ -506,8 +501,9 @@ return array(
 				// Product option
 				array('route' => 'productOption', 'roles' => array('admin')),
 				array('route' => 'productOption/index', 'roles' => array('admin')),
+				array('route' => 'productOption/list', 'roles' => array('admin')),
+				array('route' => 'productOption/export', 'roles' => array('admin')),
 				array('route' => 'productOption/update', 'roles' => array('admin')),
-				array('route' => 'productOption/delete', 'roles' => array('admin')),
 					
 					
 			)
@@ -574,14 +570,17 @@ return array(
 	),
 		
 	'ppitProduct' => array(
+			'properties' => array(),
 			'criteria' => array(),
-			'todo' => array(
-					'sales_manager' => array(),
-					'business_owner' => array(),
-			),
 	),
 		
 	'ppitProduct/index' => array(
 			'title' => array('en_US' => 'P-PIT Sales', 'fr_FR' => 'P-PIT Ventes'),
 	),
+
+	'ppitProduct/search' => array(),
+
+	'ppitProduct/list' => array(),
+		
+	'ppitProduct/update' => array(),
 );

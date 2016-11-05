@@ -27,7 +27,7 @@ function getParams(type) {
 	var max_price = document.getElementById('search_max_price').value;
 	if (max_price.length >= 2) { params += 'max_price=' + max_price + '&'; todo = false; }
 	
-<?php foreach ($context->getInstance()->specifications['ppitMasterData']['properties'] as $propertyId => $property) : ?>
+<?php foreach ($context->getConfig('ppitProduct')['properties'] as $propertyId => $property) : ?>
 
 	var <?php echo $propertyId ?> = document.getElementById('search_<?php echo $propertyId ?>').value;
 	if (<?php echo $propertyId ?>.length >= 2) { params += '<?php echo $propertyId ?>=' + <?php echo $propertyId ?> + '&'; todo = false; }
@@ -42,7 +42,7 @@ function getParams(type) {
 
 <?php endforeach;?>
 
-	$('#mode-text').text((todo) ? '<?php echo $this->translate('Special offers', 'ppit-master-data', $context->getLocale())?>' : '<?php echo $this->translate('Search', 'ppit-core', $context->getLocale())?>');
+	$('#mode-text').text((todo) ? '<?php echo $this->translate('available', 'ppit-master-data', $context->getLocale())?>' : '<?php echo $this->translate('search', 'ppit-core', $context->getLocale())?>');
 
 	return params;
 }
@@ -61,7 +61,7 @@ function eraseProductSearch(type) {
 	$('#search_min_price').val('');
 	$('#search_max_price').val('');
 
-<?php foreach ($context->getInstance()->specifications['ppitMasterData']['properties'] as $propertyId => $property) : ?>
+<?php foreach ($context->getConfig('ppitProduct')['properties'] as $propertyId => $property) : ?>
 	$('#search_<?php echo $propertyId ?>').val('');
 	$('#search_min_<?php echo $propertyId ?>').val('');
 	$('#search_max_<?php echo $propertyId ?>').val('');
@@ -103,7 +103,7 @@ function connectProductSearchInputs(type) {
 	$('#erase-button').unbind();
 	$('#erase-button').click(function () { eraseProductSearch(type); });
 
-<?php foreach ($context->getInstance()->specifications['ppitMasterData']['properties'] as $propertyId => $property) : ?>
+<?php foreach ($context->getConfig('ppitProduct')['properties'] as $propertyId => $property) : ?>
 	$('#search_<?php echo $propertyId ?>').keyup(function () { filterProductList(type); });
 	$('#search_min_<?php echo $propertyId ?>').keyup(function () { filterProductList(type); });
 	$('#search_max_<?php echo $propertyId ?>').keyup(function () { filterProductList(type); });
@@ -135,8 +135,13 @@ function getProductList(type, params, major, dir) {
 			// Connect the detail anchors
 			$('.product-detail-anchor').each(function () {
 				$(this).click(function () {
-					getProductDetail(type, $(this).attr('id').split('_')[1]);
+					getProductDetail(type, $(this).attr('id').split('_')[1], 'product');
 				});
+			});
+			
+			// Connect the options anchors
+			$('#option-anchor').click(function () {
+				getProductDetail(type, 0, 'options');
 			});
 	<?php if (!$config['ppitCoreSettings']['isTraceActive']) : ?>
 			}
@@ -146,8 +151,106 @@ function getProductList(type, params, major, dir) {
 	xhttp.send();
 }
 
+<?php 
+$properties = array();
+
+$properties['product-brand'] = array('type' => 'input', 'mandatory' => true, 'maxSize' => 255);
+$properties['product-reference'] = array('type' => 'input', 'mandatory' => true, 'maxSize' => 255);
+$properties['product-caption'] = array('type' => 'input', 'mandatory' => true, 'maxSize' => 255);
+$properties['product-description'] = array('type' => 'input', 'mandatory' => false, 'maxSize' => 2047);
+$properties['product-is_available'] = array('type' => 'checkbox');
+
+foreach ($context->getConfig('ppitProduct/update') as $propertyId => $options) {
+	$property = $context->getConfig('ppitProduct')['properties'][$propertyId];
+	if ($property['type'] == 'number') $properties['product-'.$propertyId] = array('type' => $property['type'], 'mandatory' => $options['mandatory'], 'minValue' => $property['minValue'], 'maxValue' => $property['maxValue']);
+	else $properties['product-'.$propertyId] = array('type' => $property['type'], 'mandatory' => $options['mandatory'], 'maxSize' => ($property['type'] == 'textarea') ? 2047 : 255);
+}
+
+$properties['product-variant-number'] = array('type' => 'hidden');
+$properties['product-price_0'] = array('type' => 'number', 'minValue' => -9999999999, 'maxValue' => 9999999999);
+$properties['product-tax_1_share'] = array('type' => 'number', 'minValue' => 0, 'maxValue' => 100);
+$properties['product-tax_2_share'] = array('type' => 'number', 'minValue' => 0, 'maxValue' => 100);
+$properties['product-tax_3_share'] = array('type' => 'number', 'minValue' => 0, 'maxValue' => 100);
+$properties['update_time'] = array('type' => 'hidden');
+
+echo $this->partial('/partials/check-update-properties', array('entity' => 'Product', 'context' => $context, 'properties' => $properties)) 
+?>
+
+function connectProductUpdateForm(type, id, action)
+{
+
+<?php foreach ($properties as $propertyId => $property) : ?>
+	<?php if ($property['type'] == 'date') : ?>
+	$('#input_<?php echo $propertyId ?>').datepicker();
+	<?php endif;?>
+<?php endforeach ?>
+
+	// Check validity
+	var validity = checkProductUpdateProperties(id);
+	if (validity) {
+	
+		// Create a new FormData object.
+		var formData = new FormData();
+		
+		// Get the properties values
+<?php foreach ($properties as $propertyId => $property) : ?>
+	<?php if ($property['type'] == 'input' || $property['type'] == 'date' || $property['type'] == 'textarea' || $property['type'] == 'select' || $property['type'] == 'repository' || $property['type'] == 'number' || $property['type'] == 'email' || $property['type'] == 'phone' || $property['type'] == 'hidden') : ?>
+			formData.append('<?php echo $propertyId ?>', document.getElementById('<?php echo $propertyId ?>').value);
+	<?php elseif ($property['type'] == 'checkbox') : ?>
+			formData.append('<?php echo $propertyId ?>', ((document.getElementById('<?php echo $propertyId ?>').checked) ? 1 : 0));
+	<?php endif ?>
+<?php endforeach ?>
+
+		var xhttp = new XMLHttpRequest();
+		var route, target;
+		route = '<?php echo $this->url('product/update') ?>/' + type + '/' + id;
+		if (action) route += '/' + action;
+		xhttp.open('POST', route, true);
+		// Set up a handler for when the request finishes.
+		xhttp.onload = function () {
+			if (xhttp.readyState == 4 <?php if (!$context->getConfig()['ppitCoreSettings']['isTraceActive']) echo '&& xhttp.status == 200' ?>) {
+				$('#product-update-panel').html(xhttp.responseText);
+				filterProductList(type);
+				$('#remove-anchor').click(function () { $('#product-update-panel').hide(); });
+				$('.action-btn').removeClass('btn-primary').addClass('btn-default');
+			}
+		};
+		xhttp.send(formData);
+	}
+	else return false;
+}
+
+function getProductUpdate(type, id, action) {
+
+	var xhttp = new XMLHttpRequest();
+	var route = '<?php echo $this->url('product/update') ?>/' + type + '/' + id;
+	if (action) route += '/' + action;
+	xhttp.open('GET', route, true);
+	xhttp.onreadystatechange = function() {
+		if (xhttp.status == 401) location.href = '<?php echo $this->url('ppitUser/expired')?>';
+		if (xhttp.readyState == 4) {
+	<?php if (!$config['ppitCoreSettings']['isTraceActive']) : ?>
+			if (xhttp.status == 200) {
+	<?php endif;?>
+			$('#product-update-panel').html(xhttp.responseText);			
+			$('#product-up-submit-button').click(function () { connectProductUpdateForm(type, id, action); });
+			$('#product-submit-button').click(function () { connectProductUpdateForm(type, id, action); });
+			
+<?php if (!$config['ppitCoreSettings']['isTraceActive']) : ?>
+			}
+<?php endif;?>
+		}
+	}
+	xhttp.send();
+
+	// Highlight the clicked button (and only it in its class)
+	$('.action-btn').removeClass("btn-primary").addClass("btn-default");
+	if (action == 'update') $('#product-update-anchor').removeClass("btn-default").addClass("btn-primary");
+	else if (action == 'delete') $('#product-delete-anchor').removeClass("btn-default").addClass("btn-primary");
+}
+
 // Load the detail panel
-function getProductDetail(type, id) {
+function getProductDetail(type, id, mode) {
 
 	// Ensure the target is displayed
 	$('#form_action').show();
@@ -166,9 +269,21 @@ function getProductDetail(type, id) {
 	<?php if (!$config['ppitCoreSettings']['isTraceActive']) : ?>
 			if (xhttp.status == 200) {
 	<?php endif;?>
-			document.getElementById('product_1_panel').innerHTML = xhttp.responseText;
+			$('#form_panel').html(xhttp.responseText);
+			$('#form_panel').show();
+			connectRemoveIcon(type, 'remove-anchor', 'form_panel');
+			if (mode == 'options') {
+				$('#product-title').hide();
+				getOptionList(type, $('#product_id').val(), '?', 'reference', 'ASC');
+			}
+			else {
+				getProductUpdate(type, id, '');
+				if (id == 0) $('#option-title').hide();
+				else getOptionList(type, $('#product_id').val(), '?', 'reference', 'ASC');
+				$('#product-update-anchor').click(function () { getProductUpdate(type, id, 'update'); });
+				$('#product-delete-anchor').click(function () { getProductUpdate(type, id, 'delete'); });
+			}
 
-			connectRemoveIcon(type, 'remove-anchor', 'product_1_panel');
 	<?php if (!$config['ppitCoreSettings']['isTraceActive']) : ?>
 			}
 	<?php endif;?>
@@ -178,7 +293,8 @@ function getProductDetail(type, id) {
 
 	// Highlight the clicked button (and only it in its class)
 	$('.index-btn').removeClass("btn-primary").addClass("btn-default");
-	$('#product-detail-anchor_' + id).removeClass("btn-default").addClass("btn-primary");
+	if (mode == 'options') $('#option-anchor').removeClass("btn-default").addClass("btn-primary");
+	else $('#product-detail-anchor_' + id).removeClass("btn-default").addClass("btn-primary");
 }
 
 function activateProduct(type) {
@@ -186,10 +302,8 @@ function activateProduct(type) {
 	// Load the search panel and highlight the menu entry
 	loadPanel('search_panel', '<?php echo $this->url('product/search') ?>/' + type);
 	$('.menu-btn').removeClass("btn-primary").addClass("btn-default");
-	var productAnchor;
-	productAnchor = '#' + type + '-anchor';
-	$(productAnchor).removeClass("btn-default").addClass("btn-primary");
-	$('#mode-text').text('<?php echo $this->translate('Special offers', 'ppit-master-data', $context->getLocale())?>');
+	$('#product-anchor').removeClass("btn-default").addClass("btn-primary");
+	$('#mode-text').text('<?php echo $this->translate('available', 'ppit-master-data', $context->getLocale())?>');
 	
 	// Connect the search inputs
 	connectProductSearchInputs(type);

@@ -1,13 +1,15 @@
 <div class="panel panel-default">
-	<div class="panel-heading" style="background: <?php echo $context->getConfig('styleSheet')['panelHeadingBackground'] ?>; color: <?php echo $context->getConfig('styleSheet')['panelHeadingColor'] ?>">
+<div class="panel-heading" style="background: <?php echo $context->getConfig('styleSheet')['panelHeadingBackground'] ?>; color: <?php echo $context->getConfig('styleSheet')['panelHeadingColor'] ?>">
 		<strong>
-			<?php echo $this->translate('Products', 'ppit-master-data', $context->getLocale());?>
-			(<span id="mode-text"></span>)
+			<?php echo $this->translate('Products', 'ppit-master-data', $context->getLocale());?> - 
+			<span id="mode-text"></span>
 		</strong>
 	</div>
 	<div class="panel-body">
 
 <!-- Filters -->
+	    <div class="col-md-4">
+	
 		<div class="form-group">
 			<label class="col-sm-5 control-label"><span class="glyphicon glyphicon-search"></span></label>
 			<div class="col-sm-7">
@@ -93,8 +95,9 @@
 	    </div>
 	    
 		<div>&nbsp;</div>
+		</div>
 		
 <!-- Add or update section -->
-		<div id="product-list-panel"></div>
+		<div class="col-md-8" id="product-list-panel"></div>
 	</div>
 </div>

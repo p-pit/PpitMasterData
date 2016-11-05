@@ -1,232 +1,201 @@
-<?php
-$spa = $context->isSpaMode();
-$anchorStyle = ($spa) ? $context->getAnchorStyle() : 'classic';
-$current = 'product';
-?>
 
-<!-- Display header on MPA mode -->
-<?php if (!$spa) : ?>
-	<?php 
-		$this->current = 'product';
-		echo $this->partial('/partials/menu'); 
-	?>
-<div class="row">
-    <div class="col-md-6 col-md-offset-3">
+<!-- Global message -->
+<?php if ($message == 'OK') : ?>
+		<div id="message">
+			<div class="alert alert-success"><h4><?php echo $this->translate('Your request have been registered', 'ppit-core', $context->getLocale()) ?></h4></div>
+		</div>
 <?php endif;?>
 
-		<div class="panel panel-default">
-            <div class="panel-heading">
-				<?php echo $this->translate('Update a product', 'ppit-master-data', $context->getLocale());?>: <?php echo $product->product_category->caption ?>
- 				<div class="btn-group pull-right">
-					<?php echo $this->partial('/partials/anchor-widget.phtml', array(
-							'glyphicon' => 'glyphicon-remove',
-							'title' => $this->translate('Return to list', 'ppit-core', $context->getLocale()),
-							'id' => 'remove-anchor',
-							'anchorStyle' => $anchorStyle,
-							'spa' => $spa,
-					)) ?>
-				</div>
-			</div>
-           	<div class="panel-body">
+<!-- Duplicate error -->
+<?php if ($error == 'Duplicate') : ?>
+		<div class="form-group">
+			<div class="alert alert-danger"><p class="help-block"><?php echo $this->translate('This record already exist', 'ppit-core', $context->getLocale()) ?></p></div>
+		</div>
+<?php endif;?>
 
-<!-- Form header -->
-<?php echo $this->partial('/partials/form-header', array(
-			'id' => $id,
-			'update_time' => $product->update_time,
-			'message' => $message,
-			'error' => $error,
-			'csrfForm' => $csrfForm,
-			'context' => $context,
-)) ?>
+<!-- Isolation error -->
+		<input type="hidden" id="update_time" value="<?php echo $product->update_time ?>" />
+<?php if ($error == 'Isolation') : ?>
+		<div class="form-group">
+			<div class="alert alert-danger"><p class="help-block"><?php echo $this->translate('The database has evolved in the meantime, please input again', 'ppit-core', $context->getLocale()) ?></p></div>
+		</div>
+<?php endif;?>
 
-<?php if ($message == 'OK') $isDisabled = true; else $isDisabled = false; ?>
+<!--  CSRF -->
+<?php $element = $csrfForm->get('csrf') ?>
+		<div class="form-group">
+			<?php echo $this->formElement($element) ?>
+<?php if ($this->formElementErrors($element)) : ?>
+			<div class="alert alert-danger"><p class="help-block"><?php echo $this->translate('The form has expired, please input again', 'ppit-core', $context->getLocale()) ?></p></div>
+<?php endif;?>
+		</div>
 
-<!-- Brand -->
-<?php
-	echo $this->partial('/partials/input-widget.phtml', array(
-		'property' => 'brand',
-		'label' => '* '.$this->translate('Brand', 'ppit-master-data', $context->getLocale()),
-		'value' => $product->brand,
-		'isMandatory' => true,
-		'maxLength' => 255,
-		'context' => $context,
-		'isDisabled' => $isDisabled,
-)); ?>
-
-<!-- Reference -->
-<?php
-	echo $this->partial('/partials/input-widget.phtml', array(
-		'property' => 'reference',
-		'label' => $this->translate('Reference', 'ppit-master-data', $context->getLocale()),
-		'value' => $product->reference,
-		'isMandatory' => false,
-		'maxLength' => 255,
-		'context' => $context,
-		'isDisabled' => $isDisabled,
-)); ?>
-
-<!-- Caption -->
-<?php
-	echo $this->partial('/partials/input-widget.phtml', array(
-		'property' => 'caption',
-		'label' => '* '.$this->translate('Caption', 'ppit-core', $context->getLocale()),
-		'value' => $product->caption,
-		'isMandatory' => true,
-		'maxLength' => 255,
-		'context' => $context,
-		'isDisabled' => $isDisabled,
-)); ?>
-					
-<!-- Description -->
-<?php echo $this->partial('/partials/textarea-widget.phtml', array(
-		'property' => 'description',
-		'label' => $this->translate('Description', 'ppit-core', $context->getLocale()),
-		'rows' => 3, 
-		'value' => $product->description,
-		'isMandatory' => false,
-		'maxLength' => 2047,
-		'context' => $context,
-		'isDisabled' => $isDisabled,
-)); ?>
-					
-<!-- Available ? -->
-<?php
-	echo $this->partial('/partials/checkbox-widget.phtml', array(
-		'property' => 'is_available',
-		'label' => $this->translate('Available ?', 'ppit-master-data', $context->getLocale()),
-		'value' => $product->is_available,
-		'context' => $context,
-		'isDisabled' => $isDisabled,
-)); ?>
-
-<!-- Properties -->
-<?php foreach ($product->product_category->properties as $property => $definition) : ?>
-	<?php echo $this->partial('/partials/dynamic-widget.phtml', array(
-			'property' => $property,
-			'definition' => $definition,
-			'collection' => $product->properties,
-			'context' => $context,
-			'isDisabled' => $isDisabled,
-	)); ?>
-<?php endforeach;?>
-
-<!-- Prices -->
-<div class="form-group">
-	<label class="col-sm-5 control-label"><?php echo $this->translate('Price', 'ppit-master-data', $context->getLocale()) ?>:</label>
-	<div class="col-sm-7">&nbsp;</div>
-</div>
-<?php foreach ($config['ppitMasterDataSettings']['priceCategories'] as $category => $caption) : ?>
-	<?php echo $this->partial('/partials/number-widget.phtml', array(
-			'property' => 'price_'.$category,
-			'label' => '* '.$caption,
-			'value' => $product->prices[$category],
-			'isMandatory' => true,
-			'min' => 0.01,
-			'max' => 999999,
-			'context' => $context,
-			'isDisabled' => $isDisabled,
-	)); ?>
-<?php endforeach;?>
-
-<!-- Form footer -->
-<?php echo $this->partial('/partials/form-footer') ?>
-
+<?php if (!$product->id) : ?>
+	    <div class="form-group">
+			<div class="col-sm-5">&nbsp;</div>
+			<div class="col-sm-7">
+				<input type="submit" id="product-up-submit-button" class="btn btn-warning" value="<?php echo $this->translate('Add', 'ppit-core', $context->getLocale()) ?>">
 			</div>
 		</div>
-<?php if (!$spa) : ?>
-	</div>
-</div>
+
+<?php elseif ($action == 'update') : ?>
+	    <div class="form-group">
+			<div class="col-sm-5">&nbsp;</div>
+			<div class="col-sm-7">
+				<input name="submit" type="submit" id="product-up-submit-button" class="btn btn-warning" value="<?php echo $this->translate('Update', 'ppit-core', $context->getLocale()) ?>">
+			</div>
+		</div>
+
+<?php elseif ($action == 'delete') : ?>
+	    <div class="form-group">
+			<div class="col-sm-5">&nbsp;</div>
+			<div class="col-sm-7">
+				<input name="submit" type="submit" id="product-up-submit-button" class="btn btn-danger" value="<?php echo $this->translate('Delete', 'ppit-core', $context->getLocale()) ?>">
+			</div>
+		</div>
 <?php endif;?>
 
-<!-- Load the common form javascript functions -->
-<?php echo $this->partial('/partials/common-form-js.phtml'); ?>
+		<div>&nbsp;</div>
 
-<script id="product_update_script">
+<?php 
+if ($product->id && $action != 'update' || $message == 'OK') $isDisabled = true; else $isDisabled = false;
+?>
 
-// Close form
-<?php echo $this->partial('/partials/form-return-script', array(
-		'id' => 'remove-anchor',
-		'route' => $this->url('product/index', array('product_category_id' => $product->product_category_id)),
-		'spa' => $spa,
-)) ?>
+		<div class="form-group" id="product-brand_group">
+			<label class="col-sm-5 control-label">* <?php echo $this->translate('Brand', 'ppit-master-data', $context->getLocale()) ?></label>
+			<div class="col-sm-7">
+				<input class="form-control" id="product-brand" value="<?php echo $product->brand ?>" <?php if ($isDisabled) echo 'disabled="disabled"'?> />
+			</div>
+			<div class="col-sm-12"><p class="help-block" id="product-brand_error"></p></div>
+		</div>
 
-<?php if ($message == 'OK') : ?>
+		<div class="form-group" id="product-reference_group">
+			<label class="col-sm-5 control-label">* <?php echo $this->translate('Reference', 'ppit-core', $context->getLocale()) ?></label>
+			<div class="col-sm-7">
+				<input class="form-control" id="product-reference" value="<?php echo $product->reference ?>" <?php if ($isDisabled) echo 'disabled="disabled"'?> />
+			</div>
+			<div class="col-sm-12"><p class="help-block" id="product-reference_error"></p></div>
+		</div>
 
-<?php echo $this->partial('/partials/form-return-script', array(
-		'id' => 'foot-return-anchor',
-		'route' => $this->url('product/index', array('product_category_id' => $product->product_category_id)),
-		'spa' => $spa,
-)) ?>
+		<div class="form-group" id="product-caption_group">
+			<label class="col-sm-5 control-label">* <?php echo $this->translate('Caption', 'ppit-core', $context->getLocale()) ?></label>
+			<div class="col-sm-7">
+				<input class="form-control" id="product-caption" value="<?php echo $product->caption ?>" <?php if ($isDisabled) echo 'disabled="disabled"'?> />
+			</div>
+			<div class="col-sm-12"><p class="help-block" id="product-caption_error"></p></div>
+		</div>
 
-<?php else : ?>
+		<div class="form-group" id="product-description_group">
+			<label class="col-sm-5 control-label"><?php echo $this->translate('Description', 'ppit-core', $context->getLocale()) ?></label>
+			<div class="col-sm-7">
+				<textarea class="form-control" id="product-description" <?php if ($isDisabled) echo 'disabled="disabled"'?>><?php echo $product->description ?></textarea>
+			</div>
+			<div class="col-sm-12"><p class="help-block" id="product-description_error"></p></div>
+		</div>
 
-<?php echo $this->partial('/partials/form-return-script', array(
-		'id' => 'cancel-anchor',
-		'route' => $this->url('product/index', array('product_category_id' => $product->product_category_id)),
-		'spa' => $spa,
-)) ?>
+		<div class="form-group" id="product-is_available_group">
+			<label class="col-sm-5 control-label"><?php echo $this->translate('Available ?', 'ppit-master-data', $context->getLocale()) ?></label>
+			<div class="col-sm-7">
+				<input type="checkbox" id="product-is_available" class="form-control" value="1"<?php if ($product->is_available) echo ' checked="checked"' ?><?php if (isset($isDisabled) && $isDisabled) echo ' disabled ="disabled"' ?>>
+			</div>
+			<div class="col-sm-12"><p class="help-block" id="product-is_available_error"></p></div>
+		</div>
 
-// Submit
-<?php
-$properties = array(
-		'brand' => 'input',
-		'reference' => 'input',
-		'caption' => 'input',
-		'description' => 'input',
-		'is_available' => 'checkbox',
-		'price' => 'input',
-		'update_time' => 'hidden',
-);
-// Add dynamic properties
-foreach ($product->product_category->properties as $property => $definition) {
-	$properties['property_'.$property] = $definition['type'];
-}
-// Add prices
-foreach ($config['ppitMasterDataSettings']['priceCategories'] as $category => $caption) {
-	$properties['price_'.$category] = 'input';
-}
-echo $this->partial('/partials/form-button-script', array(
-		'context' => $context,
-		'id' => 'submit-button',
-		'checkFunction' => 'checkForm',
-		'formRoute' => $this->url('product/update', array('product_category_id' => $product->product_category_id, 'id' => $id)),
-		'formScript' =>'product_update_script',
-		'properties' => $properties,
-		'mainRoute' => $this->url('product/index', array('product_category-id' => $product->product_category_id)),
-		'mainScript' =>'product_script',
-		'hideForm' => false,
-)) ?>
+<?php foreach ($context->getConfig('ppitProduct/update'.(($type) ? '/'.$type : '')) as $propertyId => $options) : ?>
+	<?php 
+	$property = $context->getConfig('product'.(($type) ? '/'.$type : ''))['properties'][$propertyId];
+	if ($property['type'] == 'repository') $property = $context->getConfig($property['definition']);
+	?>
+		<div class="form-group" id="<?php echo (($property['type'] == 'date' || $property['type'] == 'number') ? 'input_' : '').'product-'.$propertyId ?>_group">
+			<label class="col-sm-5 control-label"><?php if ($options['mandatory']) echo '* ' ?><?php echo $property['labels'][$context->getLocale()] ?></label>
+			<div class="col-sm-7">
 
+	<?php if ($property['type'] == 'date') : ?>
+				<input type="hidden" id="product-<?php echo $propertyId ?>" />
+				<input class="form-control" id="input_product-<?php echo $propertyId ?>" value="<?php echo $context->decodeDate($product->properties[$propertyId]) ?>" <?php if ($isDisabled) echo 'disabled="disabled"'?> />
+
+	<?php elseif ($property['type'] == 'number') : ?>
+				<input type="hidden" id="product-<?php echo $propertyId ?>" />
+				<input class="form-control" id="input_product-<?php echo $propertyId ?>" value="<?php echo $context->formatFloat($product->properties[$propertyId], 2) ?>" <?php if ($isDisabled) echo 'disabled="disabled"'?> />
+
+	<?php elseif ($property['type'] == 'textarea') : ?>
+				<textarea class="form-control" id="product-<?php echo $propertyId ?>" <?php if ($isDisabled) echo 'disabled="disabled"'?>><?php echo $product->properties[$propertyId] ?></textarea>
+
+	<?php elseif ($property['type'] == 'select') : ?>
+				<select class="form-control" id="product-<?php echo $propertyId ?>" <?php if ($isDisabled) echo 'disabled="disabled"'?>>
+	    			<option />
+		<?php foreach ($property['modalities'] as $key => $labels) : ?>
+	    			<option value="<?php echo $key ?>" <?php if ($product->properties[$propertyId] == $key) echo 'selected="selected"' ?>><?php echo $labels[$context->getLocale()] ?></option>
+		<?php endforeach;?>
+				</select>
+	
+	<?php else : ?>
+				<input class="form-control" id="product-<?php echo $propertyId ?>" value="<?php echo $product->properties[$propertyId] ?>" <?php if ($isDisabled) echo 'disabled="disabled"'?> />
+
+	<?php endif;?>
+			</div>
+			<div class="col-sm-12"><p class="help-block" id="<?php echo (($property['type'] == 'date' || $property['type'] == 'number') ? 'input_' : '').'product-'.$propertyId ?>_error"></p></div>
+		</div>
+<?php endforeach;?>
+
+		<input type="hidden" id="product-variant-number" value="1" />
+		<input type="hidden" id="product-price_0" />
+		<div class="form-group" id="input_product-price_0_group">
+			<label class="col-sm-5 control-label">* <?php echo $this->translate('Price', 'ppit-master-data', $context->getLocale()) ?></label>
+			<div class="col-sm-7">
+				<input class="form-control" id="input_product-price_0" value="<?php echo $context->formatFloat($product->variants[0]['price'], 2) ?>" <?php if ($isDisabled) echo 'disabled="disabled"'?> />
+			</div>
+			<div class="col-sm-12"><p class="help-block" id="input_product-price_0_error"></p></div>
+		</div>
+
+		<input type="hidden" id="product-tax_1_share" />
+		<div class="form-group" id="input_product-tax_1_share_group">
+			<label class="col-sm-5 control-label"><?php echo $this->translate('Tax 1 share', 'ppit-master-data', $context->getLocale()) ?> (%)</label>
+			<div class="col-sm-7">
+				<input class="form-control" id="input_product-tax_1_share" value="<?php echo $context->formatFloat($product->tax_1_share*100, 2) ?>" <?php if ($isDisabled) echo 'disabled="disabled"'?> />
+			</div>
+			<div class="col-sm-12"><p class="help-block" id="input_product-tax_1_share_error"></p></div>
+		</div>
+
+		<input type="hidden" id="product-tax_2_share" />
+		<div class="form-group" id="input_product-tax_2_share_group">
+			<label class="col-sm-5 control-label"><?php echo $this->translate('Tax 2 share', 'ppit-master-data', $context->getLocale()) ?> (%)</label>
+			<div class="col-sm-7">
+				<input class="form-control" id="input_product-tax_2_share" value="<?php echo $context->formatFloat($product->tax_2_share*100, 2) ?>" <?php if ($isDisabled) echo 'disabled="disabled"'?> />
+			</div>
+			<div class="col-sm-12"><p class="help-block" id="input_product-tax_2_share_error"></p></div>
+		</div>
+
+		<input type="hidden" id="product-tax_3_share" />
+		<div class="form-group" id="input_product-tax_3_share_group">
+			<label class="col-sm-5 control-label"><?php echo $this->translate('Tax 3 share', 'ppit-master-data', $context->getLocale()) ?> (%)</label>
+			<div class="col-sm-7">
+				<input class="form-control" id="input_product-tax_3_share" value="<?php echo $context->formatFloat($product->tax_3_share*100, 2) ?>" <?php if ($isDisabled) echo 'disabled="disabled"'?> />
+			</div>
+			<div class="col-sm-12"><p class="help-block" id="input_product-tax_3_share_error"></p></div>
+		</div>
+
+<?php if (!$product->id) : ?>
+		    <div class="form-group">
+				<div class="col-sm-5">&nbsp;</div>
+				<div class="col-sm-7">
+					<input name="submit" type="submit" id="product-submit-button" class="btn btn-warning" value="<?php echo $this->translate('Add', 'ppit-core', $context->getLocale()) ?>">
+				</div>
+			</div>
+
+<?php elseif ($action == 'update') : ?>
+		    <div class="form-group">
+				<div class="col-sm-5">&nbsp;</div>
+				<div class="col-sm-7">
+					<input name="submit" type="submit" id="product-submit-button" class="btn btn-warning" value="<?php echo $this->translate('Update', 'ppit-core', $context->getLocale()) ?>">
+				</div>
+			</div>
+
+<?php elseif ($action == 'delete') : ?>
+		    <div class="form-group">
+				<div class="col-sm-5">&nbsp;</div>
+				<div class="col-sm-7">
+					<input name="submit" type="submit" id="product-submit-button" class="btn btn-danger" value="<?php echo $this->translate('Delete', 'ppit-core', $context->getLocale()) ?>">
+				</div>
+			</div>
 <?php endif;?>
-
-// The elements are checked last to first so the focus is positionned on the first element on error
-function checkForm() 
-{
-	var validity = true;	
-
-// Prices
-<?php foreach ($config['ppitMasterDataSettings']['priceCategories'] as $category => $caption) : ?>
-	if (!check_price_<?php echo $category ?>()) validity = false;
-<?php endforeach;?>
-
-// Properties
-<?php foreach ($product->product_category->properties as $property => $definition) : ?>
-	if (!check_property_<?php echo $property ?>()) validity = false;
-<?php endforeach;?>
-
-// Description
-if (!check_description()) validity = false;
-
-// Caption
-if (!check_caption()) validity = false;
-
-// Reference
-if (!check_reference()) validity = false;
-
-// Brand
-if (!check_brand()) validity = false;
-
-	return validity;
-}
-</script>
-  
