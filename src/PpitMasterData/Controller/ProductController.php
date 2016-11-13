@@ -7,6 +7,8 @@ use PpitCore\Model\Context;
 use PpitCore\Model\Csrf;
 use PpitMasterData\Model\Product;
 use Zend\Mvc\Controller\AbstractActionController;
+use Zend\Log\Logger;
+use Zend\Log\Writer;
 use Zend\View\Model\ViewModel;
 use Zend\View\Model\JsonModel;
 
@@ -75,7 +77,7 @@ class ProductController extends AbstractActionController
 		
 		// Retrieve the query parameters
 		$filters = array();
-
+		
 		$brand = ($params()->fromQuery('brand', null));
 		if ($brand) $filters['brand'] = $brand;
 
@@ -101,7 +103,8 @@ class ProductController extends AbstractActionController
 			if ($max_property) $filters['max_property_'.$i] = $max_property;
 		}
 		
-		foreach ($context->getConfig('ppitProduct'.(($type) ? '/'.$type : ''))['criteria'] as $criterion => $unused) {
+		$def = $context->getConfig('ppitProduct'.(($type) ? '/'.$type : ''));
+		if ($def) foreach ($def['criteria'] as $criterion => $unused) {
 			$value = ($params()->fromQuery($criterion, null));
 			if ($value) $filters[$criterion] = $value;
 		}
@@ -136,7 +139,6 @@ class ProductController extends AbstractActionController
 		$type = $this->params()->fromRoute('type', null);
 
 		$params = $this->getFilters($this->params(), $type);
-
 		$major = ($this->params()->fromQuery('major', 'caption'));
 		$dir = ($this->params()->fromQuery('dir', 'ASC'));
 
@@ -170,13 +172,16 @@ class ProductController extends AbstractActionController
    		return $this->getList();
    	}
 
-   	public function restListAction()
+   	public function serviceListAction()
    	{
    		$context = Context::getCurrent();
-   	
-   		$instance_caption = $this->params()->fromRoute('instance_caption', null);
-   		$type = $this->params()->fromRoute('type', null);
-   	
+   		$writer = new Writer\Stream('data/log/commitment_try.txt');
+   		$logger = new Logger();
+   		$logger->addWriter($writer);
+
+   		$instance_caption = $context->getInstance()->caption;
+   		$type = 'service';
+
    		$safe = $context->getConfig()['ppitUserSettings']['safe'];
    		$safeEntry = $safe[$instance_caption];
    		$username = null;
@@ -193,12 +198,28 @@ class ProductController extends AbstractActionController
    		if (!array_key_exists($username, $safeEntry) || $password != $safeEntry[$username]) {
    			 
    			// Write to the log
-   			$logger->info('product/restList/'.$instance_caption.'/'.$type.';401;'.$username);
+   			$logger->info('product/serviceList/'.$instance_caption.'/'.$type.';401;'.$username);
    			$this->getResponse()->setStatusCode('401');
    			return $this->getResponse();
    		}
    		else {
-   			return new JsonModel($this->getList()->products);
+   			$result = array();
+			$params = $this->getFilters($this->params(), 'service');
+			$params['is_available'] = false; // Temporary
+
+   			foreach (Product::getList('service', $params, 'reference', 'ASC', 'search') as $product) {
+   				$item = array(
+   						'reference' => $product->reference,
+   						'caption' => $product->caption,
+   						'description' => $product->description,
+   				);
+   				foreach ($context->getConfig('ppitProduct/service')['properties'] as $propertyId => $property) {
+   					$item[$property['property_name']] = $product->toArray()[$propertyId];
+   				}
+   				$item['variants'] = $product->variants;
+   				$result[] = $item;
+   			}
+   			return new JsonModel($result);
    		}
    	}
    	
@@ -254,8 +275,8 @@ class ProductController extends AbstractActionController
 
     			// Load the input data
 		    	$data = array();
-				$data['type'] = $type;
-				$data['brand'] = $request->getPost(('product-brand'));
+    			$data['type'] = $request->getPost(('product-type'));
+		    	$data['brand'] = $request->getPost(('product-brand'));
 				$data['reference'] = $request->getPost(('product-reference'));
 				$data['caption'] = $request->getPost(('product-caption'));
 				$data['description'] = $request->getPost(('product-description'));

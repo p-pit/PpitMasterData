@@ -149,7 +149,6 @@ class Product implements InputFilterAwareInterface
     {
     	$context = Context::getCurrent();
     	$select = Product::getTable()->getSelect();
-    	 
     	$where = new Where();
     	$where->notEqualTo('md_product.status', 'deleted');
 
@@ -161,14 +160,15 @@ class Product implements InputFilterAwareInterface
     		$where->equalTo('is_available', 1);
     	}
     	else {
-    			
     		// Set the filters
+    		if (isset($params['type'])) $where->like('type', '%'.$params['type'].'%');
     		if (isset($params['brand'])) $where->like('brand', '%'.$params['brand'].'%');
     		if (isset($params['reference'])) $where->like('reference', '%'.$params['reference'].'%');
     		if (isset($params['caption'])) $where->like('caption', '%'.$params['caption'].'%');
     		if (isset($params['min_price'])) $where->greaterThanOrEqualTo('prices', $params['min_price']);
     		if (isset($params['max_price'])) $where->lessThanOrEqualTo('prices', $params['max_price']);
-    
+    		if (isset($params['is_available'])) $where->equalTo('is_available', $params['is_available']);
+    		
     		for ($i = 1; $i < 20; $i++) {
     			if (isset($params['property_'.$i])) $where->like('property_'.$i, '%'.$params['property_'.$i].'%');
     			if (isset($params['min_property_'.$i])) $where->greaterThanOrEqualTo('property_'.$i, $params['min_property_'.$i]);
@@ -181,8 +181,8 @@ class Product implements InputFilterAwareInterface
     	$cursor = Product::getTable()->selectWith($select);
     	$products = array();
     	foreach ($cursor as $product) {
-    		if (count($product->variants) > 0) $keep = false;
-    		else $keep = true;
+    		if (count($params) == 0) $keep = true;
+    		else $keep = false;
     		foreach ($product->variants as $variantId => $variantCriteria) {
     			$keepVariant = true;
     			foreach ($context->getConfig('ppitProduct'.(($type) ? '/'.$type : ''))['criteria'] as $criterion => $unused) {
@@ -200,8 +200,7 @@ class Product implements InputFilterAwareInterface
 	    		$products[] = $product;
     		}
     	}
-    
-    	return $products;
+		return $products;
     }
 
     public static function instanciate()
@@ -265,23 +264,25 @@ class Product implements InputFilterAwareInterface
 //    	$product->product_category = ProductCategory::get($product->product_category_id);
 		
 		// Retrieve the available options for this product
-		$select = ProductOption::getTable()->getSelect()->where(array('product_id' => $product->id))
-			->where(array('is_available' => true))
-			->order(array('caption'));
-		$cursor2 = ProductOption::getTable()->selectWith($select);
-		$product->optionList = array();
-		foreach($cursor2 as $option) {
-		
-			$option->selected = false;
-			$product->optionList[$option->id] = $option;
+		if ($product) {
+			$select = ProductOption::getTable()->getSelect()->where(array('product_id' => $product->id))
+				->where(array('is_available' => true))
+				->order(array('caption'));
+			$cursor2 = ProductOption::getTable()->selectWith($select);
+			$product->optionList = array();
+			foreach($cursor2 as $option) {
+			
+				$option->selected = false;
+				$product->optionList[$option->id] = $option;
+			}
+	
+			// Retrieve the option matrix
+			$select = ProductOptionMatrix::getTable()->getSelect()
+				->where(array('product_id' => $product->id));
+			$cursor2 = ProductOptionMatrix::getTable()->selectWith($select);
+			$product->optionMatrix = array();
+			foreach($cursor2 as $cell) $product->optionMatrix[] = $cell;
 		}
-
-		// Retrieve the option matrix
-		$select = ProductOptionMatrix::getTable()->getSelect()
-			->where(array('product_id' => $product->id));
-		$cursor2 = ProductOptionMatrix::getTable()->selectWith($select);
-		$product->optionMatrix = array();
-		foreach($cursor2 as $cell) $product->optionMatrix[] = $cell;
 
     	return $product;
     }

@@ -11,6 +11,9 @@ function getParams(type) {
 
 	// Create a new FormData object.
 	var params = '?', todo = true;
+
+	var type = $('#search_type').val();
+	if (type) { params += 'type=' + type + '&'; todo = false; }
 	
 	var brand = document.getElementById('search_brand').value;
 	if (brand.length >= 2) { params += 'brand=' + brand + '&'; todo = false; }
@@ -55,6 +58,7 @@ function exportProductList(type) {
 }
 
 function eraseProductSearch(type) {
+	$('#search_type').val('');
 	$('#search_brand').val('');
 	$('#search_reference').val('');
 	$('#search_caption').val('');
@@ -94,6 +98,7 @@ function connectProductSearchInputs(type) {
 
 	$('#export-button').click(function () { exportProductList(type); });
 	
+	$('#search_type').change(function () { filterProductList(type); });
 	$('#search_brand').keyup(function () { filterProductList(type); });
 	$('#search_reference').keyup(function () { filterProductList(type); });
 	$('#search_caption').keyup(function () { filterProductList(type); });
@@ -154,6 +159,7 @@ function getProductList(type, params, major, dir) {
 <?php 
 $properties = array();
 
+$properties['product-type'] = array('type' => 'select', 'mandatory' => true);
 $properties['product-brand'] = array('type' => 'input', 'mandatory' => true, 'maxSize' => 255);
 $properties['product-reference'] = array('type' => 'input', 'mandatory' => true, 'maxSize' => 255);
 $properties['product-caption'] = array('type' => 'input', 'mandatory' => true, 'maxSize' => 255);
@@ -277,6 +283,7 @@ function getProductDetail(type, id, mode) {
 				getOptionList(type, $('#product_id').val(), '?', 'reference', 'ASC');
 			}
 			else {
+				$('#option-title').hide();
 				getProductUpdate(type, id, '');
 				if (id == 0) $('#option-title').hide();
 				else getOptionList(type, $('#product_id').val(), '?', 'reference', 'ASC');

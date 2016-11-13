@@ -262,12 +262,12 @@ return array(
         										),
         								),
         						),
-        						'restList' => array(
+        						'serviceList' => array(
         								'type' => 'segment',
         								'options' => array(
-        										'route' => '/rest-list[/:instance_caption][/:type]',
+        										'route' => '/service-list',
         										'defaults' => array(
-        												'action' => 'restList',
+        												'action' => 'serviceList',
         										),
         								),
         						),
@@ -485,7 +485,7 @@ return array(
 				array('route' => 'product/index', 'roles' => array('user')),
 				array('route' => 'product/list', 'roles' => array('user')),
 				array('route' => 'product/criteria', 'roles' => array('guest')),
-				array('route' => 'product/restList', 'roles' => array('guest')),
+				array('route' => 'product/serviceList', 'roles' => array('guest')),
 				array('route' => 'product/search', 'roles' => array('user')),
 				array('route' => 'product/detail', 'roles' => array('user')),
 				array('route' => 'product/update', 'roles' => array('admin')),
@@ -571,6 +571,7 @@ return array(
 		
 	'ppitProduct' => array(
 			'properties' => array(),
+			'variants' => array(),
 			'criteria' => array(),
 	),
 		
