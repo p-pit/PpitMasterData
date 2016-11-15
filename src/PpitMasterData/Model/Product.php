@@ -175,7 +175,7 @@ class Product implements InputFilterAwareInterface
     			if (isset($params['max_property_'.$i])) $where->lessThanOrEqualTo('property_'.$i, $params['max_property_'.$i]);
     		}
     	}
-    
+
     	// Sort the list
     	$select->where($where)->order(array(($major) ? $major.' '.$dir : 'caption', 'caption'));
     	$cursor = Product::getTable()->selectWith($select);
@@ -187,7 +187,9 @@ class Product implements InputFilterAwareInterface
     			$keepVariant = true;
     			foreach ($context->getConfig('ppitProduct'.(($type) ? '/'.$type : ''))['criteria'] as $criterion => $unused) {
     				if (array_key_exists($criterion, $params)) {
-    					if ($variantCriteria[$criterion] != $params[$criterion]) $keepVariant = false;
+    					if ($variantCriteria[$criterion] != $params[$criterion]) {
+    						$keepVariant = false;
+    					}
     				}
     			}
     			if ($keepVariant) {
@@ -302,7 +304,7 @@ class Product implements InputFilterAwareInterface
     	}
         if (array_key_exists('brand', $data)) {
     		$this->brand = trim(strip_tags($data['brand']));
-        	if (!$this->brand || strlen($this->brand) > 255) return 'Integrity';
+        	if (strlen($this->brand) > 255) return 'Integrity';
     	}
         if (array_key_exists('reference', $data)) {
 		    $this->reference = trim(strip_tags($data['reference']));

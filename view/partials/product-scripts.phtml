@@ -160,7 +160,7 @@ function getProductList(type, params, major, dir) {
 $properties = array();
 
 $properties['product-type'] = array('type' => 'select', 'mandatory' => true);
-$properties['product-brand'] = array('type' => 'input', 'mandatory' => true, 'maxSize' => 255);
+$properties['product-brand'] = array('type' => 'input', 'mandatory' => false, 'maxSize' => 255);
 $properties['product-reference'] = array('type' => 'input', 'mandatory' => true, 'maxSize' => 255);
 $properties['product-caption'] = array('type' => 'input', 'mandatory' => true, 'maxSize' => 255);
 $properties['product-description'] = array('type' => 'input', 'mandatory' => false, 'maxSize' => 2047);

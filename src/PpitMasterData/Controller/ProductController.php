@@ -205,8 +205,7 @@ class ProductController extends AbstractActionController
    		else {
    			$result = array();
 			$params = $this->getFilters($this->params(), 'service');
-			$params['is_available'] = false; // Temporary
-
+//			$params['is_available'] = true; // Temporary
    			foreach (Product::getList('service', $params, 'reference', 'ASC', 'search') as $product) {
    				$item = array(
    						'reference' => $product->reference,
