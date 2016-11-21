@@ -488,7 +488,7 @@ return array(
 				array('route' => 'product/serviceList', 'roles' => array('guest')),
 				array('route' => 'product/search', 'roles' => array('user')),
 				array('route' => 'product/detail', 'roles' => array('user')),
-				array('route' => 'product/update', 'roles' => array('admin')),
+				array('route' => 'product/update', 'roles' => array('user')),
 				array('route' => 'product/matrix', 'roles' => array('admin')),
 				array('route' => 'product/delete', 'roles' => array('admin')),
 
@@ -499,11 +499,11 @@ return array(
 				array('route' => 'productCategory/delete', 'roles' => array('admin')),
 				
 				// Product option
-				array('route' => 'productOption', 'roles' => array('admin')),
-				array('route' => 'productOption/index', 'roles' => array('admin')),
-				array('route' => 'productOption/list', 'roles' => array('admin')),
-				array('route' => 'productOption/export', 'roles' => array('admin')),
-				array('route' => 'productOption/update', 'roles' => array('admin')),
+				array('route' => 'productOption', 'roles' => array('user')),
+				array('route' => 'productOption/index', 'roles' => array('user')),
+				array('route' => 'productOption/list', 'roles' => array('user')),
+				array('route' => 'productOption/export', 'roles' => array('user')),
+				array('route' => 'productOption/update', 'roles' => array('user')),
 					
 					
 			)
