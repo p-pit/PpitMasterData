@@ -1,5 +1,5 @@
 <?php 
-$spa = $context->isSpaMode();
+$spa = true;
 $anchorStyle = ($spa) ? $context->getAnchorStyle() : 'classic';
 ?>
 
@@ -57,11 +57,6 @@ $anchorStyle = ($spa) ? $context->getAnchorStyle() : 'classic';
 
 			</div>
 		</div>
-
-<?php if (!$context->isSpaMode()) : ?>
-	</div>
-</div>
-<?php endif;?>
 
 <script id='product_option_delete_script'>
 

@@ -1,10 +1,10 @@
 <?php
 namespace PpitMasterData\Controller;
 
-use PpitContact\Model\Vcard;
 use PpitCore\Form\CsrfForm;
 use PpitCore\Model\Context;
 use PpitCore\Model\Csrf;
+use PpitCore\Model\Vcard;
 use PpitMasterData\Model\Product;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Log\Logger;
@@ -30,7 +30,6 @@ class ProductController extends AbstractActionController
     	return new ViewModel(array(
     			'context' => $context,
     			'config' => $context->getConfig(),
-//    			'community_id' => $community_id,
 				'type' => $type,
 				'types' => $types,
     			'menu' => $menu,

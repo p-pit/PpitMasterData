@@ -41,7 +41,7 @@ class ProductCategoryController extends AbstractActionController
     		'dir' => $dir,
     		'productCategories' => $productCategories,
         ));
-   		if ($context->isSpaMode()) $view->setTerminal(true);
+   		$view->setTerminal(true);
    		return $view;
     }
 
@@ -98,7 +98,7 @@ class ProductCategoryController extends AbstractActionController
     			'message' => $message,
     			'error' => $error,
     	));
-   		if ($context->isSpaMode()) $view->setTerminal(true);
+   		$view->setTerminal(true);
    		return $view;
     }
     
@@ -157,7 +157,7 @@ class ProductCategoryController extends AbstractActionController
     		'message' => $message,
     		'error' => $error,
     	));
-   		if ($context->isSpaMode()) $view->setTerminal(true);
+   		$view->setTerminal(true);
    		return $view;
     }
 }

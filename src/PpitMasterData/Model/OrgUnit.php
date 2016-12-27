@@ -1,7 +1,7 @@
 <?php
 namespace PpitMasterData\Model;
 
-use PpitContact\Model\Community;
+use PpitCore\Model\Community;
 use PpitCore\Model\Context;
 use PpitCore\Model\Generic;
 use Zend\Db\Sql\Where;
@@ -86,8 +86,8 @@ class OrgUnit implements InputFilterAwareInterface
 	public static function getList($major, $dir, $filter = array())
 	{
 		$select = OrgUnit::getTable()->getSelect()
-			->join('contact_community', 'md_org_unit.community_id = contact_community.id', array('community_name' => 'name'), 'left')
-			->join('md_place', 'md_org_unit.place_id = md_place.id', array('place_identifier' => 'identifier', 'place_name' => 'name'), 'left')
+			->join('core_community', 'md_org_unit.community_id = core_community.id', array('community_name' => 'name'), 'left')
+			->join('core_place', 'md_org_unit.place_id = core_place.id', array('place_identifier' => 'identifier', 'place_name' => 'name'), 'left')
 			->order(array($major.' '.$dir, 'type', 'identifier'));
 		$where = new Where;
 		foreach ($filter as $property => $value) {

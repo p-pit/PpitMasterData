@@ -1,8 +1,8 @@
 <?php
 namespace PpitMasterData\Model;
 
-use PpitContact\Model\Vcard;
 use PpitCore\Model\Context;
+use PpitCore\Model\Vcard;
 use Zend\InputFilter\Factory as InputFactory;
 use Zend\InputFilter\InputFilter;
 use Zend\InputFilter\InputFilterAwareInterface;
@@ -77,8 +77,8 @@ class OrgUnitContact implements InputFilterAwareInterface
 	{
 		$select = OrgUnitContact::getTable()->getSelect()
 			->join('md_org_unit', 'md_org_unit_contact.org_unit_id = md_org_unit.id', array('community_id', 'org_unit_type' => 'type', 'org_unit_identifier' => 'identifier', 'org_unit_caption' => 'caption'), 'left')
-			->join('contact_community', 'md_org_unit.community_id = contact_community.id', array('community_name' => 'name'), 'left')
-			->join('contact_vcard', 'md_org_unit_contact.contact_id = contact_vcard.id', array('n_fn'), 'left')
+			->join('core_community', 'md_org_unit.community_id = core_community.id', array('community_name' => 'name'), 'left')
+			->join('core_vcard', 'md_org_unit_contact.contact_id = core_vcard.id', array('n_fn'), 'left')
 			->order(array($major.' '.$dir, 'n_fn'/*, 'role_id'*/));
 		if ($org_unit_id) $select->where(array('org_unit_id' => $org_unit_id));
 		$cursor = OrgUnitContact::getTable()->selectWith($select);

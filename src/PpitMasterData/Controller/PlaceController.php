@@ -3,12 +3,12 @@ namespace PpitMasterData\Controller;
 
 use DateInterval;
 use Date;
-use PpitContact\Model\Community;
+use PpitCore\Model\Community;
 use PpitCore\Model\Csrf;
 use PpitCore\Model\Context;
 use PpitCore\Model\Link;
+use PpitCore\Model\Place;
 use PpitCore\Form\CsrfForm;
-use PpitMasterData\Model\Place;
 use Zend\db\sql\Where;
 use Zend\Http\Client;
 use Zend\Http\Request;
@@ -28,7 +28,7 @@ class PlaceController extends AbstractActionController
 				'context' => $context,
 				'config' => $context->getconfig(),
 		));
-		if ($context->isSpaMode()) $view->setTerminal(true);
+		$view->setTerminal(true);
 		return $view;
 	}
 	
@@ -37,8 +37,6 @@ class PlaceController extends AbstractActionController
 		// Retrieve the context
 		$context = Context::getCurrent();
 		$instance_id = $context->getInstanceId();
-		$community_id = $context->getCommunityId();
-		$community = Community::getTable()->get($community_id);
 
 		// Filter
 		$filter = array();
@@ -51,7 +49,7 @@ class PlaceController extends AbstractActionController
 		$dir = $this->params()->fromQuery('dir', NULL);
 		if (!$dir) $dir = 'ASC';
 	    
-		$places = Place::getList($community_id, $major, $dir, $filter);
+		$places = Place::getList($major, $dir, $filter);
 	    
 		$view = new ViewModel(array(
 				'context' => $context,
@@ -70,8 +68,6 @@ class PlaceController extends AbstractActionController
 		// Retrieve the context
 		$context = Context::getCurrent();
 		$instance_id = $context->getInstanceId();
-		$community_id = $context->getCommunityId();
-		$community = Community::getTable()->get($community_id);
 
 		// Filter
 		$filter = array();
@@ -84,7 +80,7 @@ class PlaceController extends AbstractActionController
 		$dir = $this->params()->fromQuery('dir', NULL);
 		if (!$dir) $dir = 'ASC';
 
-		$places = Place::getList($community_id, $major, $dir, $filter);
+		$places = Place::getList($major, $dir, $filter);
 		$data = array();
 		foreach ($places as $place) {
 			$data[] = array(
@@ -148,7 +144,7 @@ class PlaceController extends AbstractActionController
     			'message' => $message,
     			'error' => $error
     	));
-   		if ($context->isSpaMode()) $view->setTerminal(true);
+   		$view->setTerminal(true);
    		return $view;
     }
     
@@ -206,7 +202,7 @@ class PlaceController extends AbstractActionController
     		'message' => $message,
     		'error' => $error,
     	));
-   		if ($context->isSpaMode()) $view->setTerminal(true);
+   		$view->setTerminal(true);
    		return $view;
     }
 }

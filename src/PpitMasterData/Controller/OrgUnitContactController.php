@@ -105,7 +105,7 @@ class OrgUnitContactController extends AbstractActionController
     			'message' => $message,
     			'error' => $error
     	));
-   		if ($context->isSpaMode()) $view->setTerminal(true);
+   		$view->setTerminal(true);
    		return $view;
     }
     

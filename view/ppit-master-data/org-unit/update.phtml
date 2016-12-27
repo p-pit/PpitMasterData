@@ -1,5 +1,5 @@
 <?php 
-$spa = $context->isSpaMode();
+$spa = true;
 $anchorStyle = ($spa) ? $context->getAnchorStyle() : 'classic';
 $isDeletable = $orgUnit->isDeletable();
 ?>
@@ -187,8 +187,6 @@ $isDeletable = $orgUnit->isDeletable();
 	</div>
 </div>
 <?php endif;?>
-
-<?php if (!$context->isSpaMode()) echo $this->partial('partials/view-controller') ?>
 
 <script id='org_unit_update_script'>
 

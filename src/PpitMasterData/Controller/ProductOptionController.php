@@ -128,7 +128,7 @@ class ProductOptionController extends AbstractActionController
 //    			'product_category_id' => $product_category_id,
     			'matrix' => $matrix,
     	));
-   		if ($context->isSpaMode()) $view->setTerminal(true);
+   		$view->setTerminal(true);
    		return $view;
     }
 

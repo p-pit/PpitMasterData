@@ -4,7 +4,6 @@ namespace PpitMasterData;
 use PpitCore\Model\GenericTable;
 use PpitMasterData\Model\OrgUnit;
 use PpitMasterData\Model\OrgUnitContact;
-use PpitMasterData\Model\Place;
 use PpitMasterData\Model\Product;
 use PpitMasterData\Model\ProductCategory;
 use PpitMasterData\Model\ProductOption;
@@ -63,17 +62,6 @@ class Module //implements AutoloaderProviderInterface, ConfigProviderInterface
                     $resultSetPrototype = new ResultSet();
                     $resultSetPrototype->setArrayObjectPrototype(new OrgUnitContact());
                     return new TableGateway('md_org_unit_contact', $dbAdapter, null, $resultSetPrototype);
-                },
-                'PpitMasterData\Model\PlaceTable' => function($sm) {
-                    $tableGateway = $sm->get('PlaceTableGateway');
-                    $table = new GenericTable($tableGateway);
-                    return $table;
-                },
-                'PlaceTableGateway' => function ($sm) {
-                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
-                    $resultSetPrototype = new ResultSet();
-                    $resultSetPrototype->setArrayObjectPrototype(new Place());
-                    return new TableGateway('md_place', $dbAdapter, null, $resultSetPrototype);
                 },
                 'PpitMasterData\Model\ProductTable' => function($sm) {
                     $tableGateway = $sm->get('ProductTableGateway');

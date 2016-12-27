@@ -21,7 +21,7 @@ class OrgUnitController extends AbstractActionController
     			'context' => $context,
 				'config' => $context->getconfig(),
     	));
-   		if ($context->isSpaMode()) $view->setTerminal(true);
+   		$view->setTerminal(true);
    		return $view;
     }
 
@@ -146,7 +146,7 @@ class OrgUnitController extends AbstractActionController
     			'message' => $message,
     			'error' => $error
     	));
-   		if ($context->isSpaMode()) $view->setTerminal(true);
+   		$view->setTerminal(true);
    		return $view;
     }
     
@@ -204,7 +204,7 @@ class OrgUnitController extends AbstractActionController
     		'message' => $message,
     		'error' => $error,
     	));
-   		if ($context->isSpaMode()) $view->setTerminal(true);
+   		$view->setTerminal(true);
    		return $view;
     }
 }

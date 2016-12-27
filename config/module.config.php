@@ -151,7 +151,7 @@ return array(
 						),
 					),
 				),
-			'place' => array(
+/*			'place' => array(
                 'type'    => 'literal',
                 'options' => array(
                     'route'    => '/place',
@@ -214,7 +214,7 @@ return array(
 	                    ),
 	                ),
 	       		),
-	       	),
+	       	),*/
         	'product' => array(
         				'type'    => 'literal',
         				'options' => array(
@@ -473,12 +473,12 @@ return array(
 				array('route' => 'orgUnitContact/delete', 'roles' => array('admin')),
 						
 				// Place of business
-				array('route' => 'place', 'roles' => array('admin')),
+/*				array('route' => 'place', 'roles' => array('admin')),
 				array('route' => 'place/index', 'roles' => array('admin')),
 				array('route' => 'place/list', 'roles' => array('admin')),
 				array('route' => 'place/dataList', 'roles' => array('admin')),
 				array('route' => 'place/update', 'roles' => array('admin')),
-				array('route' => 'place/delete', 'roles' => array('admin')),
+				array('route' => 'place/delete', 'roles' => array('admin')),*/
 
 				// Product
 				array('route' => 'product', 'roles' => array('user')),
@@ -564,9 +564,6 @@ return array(
 			),
 	),
 	'ppitMasterDataDependencies' => array(
-	),
-	'ppitContactDependencies' => array(
-			'md_place' => new \PpitMasterData\Model\Place,
 	),
 		
 	'ppitProduct' => array(
