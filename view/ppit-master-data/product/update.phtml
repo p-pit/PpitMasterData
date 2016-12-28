@@ -1,3 +1,8 @@
+<?php if ($product->id && $context->isDemoModeActive()) : ?>
+		<a class="tip" href="#" title="<?php echo $context->getConfig('demo')['product/update'][$context->getLocale()] ?>">
+		    <img src="<?php echo $this->basePath('img/tip.png') ?>" width="20" />
+		</a>
+<?php endif;?>
 
 <!-- Global message -->
 <?php if ($message == 'OK') : ?>
@@ -35,6 +40,11 @@
 			<div class="col-sm-5">&nbsp;</div>
 			<div class="col-sm-7">
 				<input type="submit" id="product-up-submit-button" class="btn btn-warning" value="<?php echo $this->translate('Add', 'ppit-core', $context->getLocale()) ?>">
+<?php if ($context->isDemoModeActive()) : ?>
+					<a class="tip" href="#" title="<?php echo $context->getConfig('demo')['product/add'][$context->getLocale()] ?>">
+					    <img src="<?php echo $this->basePath('img/tip.png') ?>" width="20" />
+					</a>
+<?php endif;?>
 			</div>
 		</div>
 

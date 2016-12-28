@@ -581,4 +581,89 @@ return array(
 	'ppitProduct/list' => array(),
 		
 	'ppitProduct/update' => array(),
+	'demo' => array(
+			'product/search/title' => array(
+					'en_US' => '
+<h4>Catalogue</h4>
+<p>As a default, all the products that are marked available are presented in the list.</p>
+<p>As soon as a criterion below is specified, the list switch in search mode.</p>
+',
+					'fr_FR' => '
+<h4>Catalogue</h4>
+<p>Par défaut, tous les produits marqués comme disponibles sont présentés dans la liste.</p>
+<p>Dès lors qu\'un des critères ci-dessous est spécifié, le mode de recherche est automatiquement activé.</p>
+',
+			),
+			'product/search/x' => array(
+					'en_US' => '
+<h4>Return in default mode</h4>
+<p>The <code>x</code> button reinitializes all the search criteria and reset the list filtered on available products.</p>
+',
+					'fr_FR' => '
+<h4>Retour au mode par défaut</h4>
+<p>Le bouton <code>x</code> réinitialise tous les critères de recherche et ré-affiche la liste filtrée sur les produits disponibles.</p>
+',
+			),
+			'product/search/export' => array(
+					'en_US' => '
+<h4>List export</h4>
+<p>The list can be exported to Excel as it is presented: defaulting list or list resulting of a multi-criteria search.</p>
+',
+					'fr_FR' => '
+<h4>Export de la liste</h4>
+<p>La liste peut être exportée sous Excel telle que présentée : liste par défaut ou liste résultant d\'une recherche multi-critère.</p>
+',
+			),
+			'product/list/ordering' => array(
+					'en_US' => '
+<h4>Ordering</h4>
+<p>The list can be sorted according to each column in ascending or descending order.</p>
+',
+					'fr_FR' => '
+<h4>Classement</h4>
+<p>La liste peut être triée selon chaque colonne en ordre ascendant ou descendant.</p>
+',
+			),
+			'product/list/add' => array(
+					'en_US' => '',
+					'fr_FR' => '
+<h4>Ajout d\'un produit</h4>
+<p>Le bouton + permet l\'ajout d\un nouveau produit.</p>
+					',
+			),
+			'product/add' => array(
+					'en_US' => '',
+					'fr_FR' => '
+<h4>Ajout d\'un produit</h4>
+<p>Lors de la création d\'un produit les données principales sont renseignées.</p>
+	<ul>
+		<li>Type (souscription à une offre, prestation spécifique...)</li>
+		<li>Marque, identification et description</li>
+		<li>Disponibilité</li>
+		<li>Prix et répartition du prix selon les différents régimes de TVA (standard, intermédiaire, réduit)</li>
+	</ul>
+					',
+			),
+			'product/list/detail' => array(
+					'en_US' => '',
+					'fr_FR' => '
+<h4>Détail d\'un produit</h4>
+<p>Le bouton zoom permet d\'accéder au détail d\'un produit et aux options associées.</p>
+					',
+			),
+			'product/update' => array(
+					'en_US' => '',
+					'fr_FR' => '
+<h4>Gestion des attributs du produit</h4>
+<p>L\'accès au détail d\'un produit permet de consulter et éventuellement en rectifier les données, ainsi que de gérer les options associées au produit.</p>
+					',
+			),
+			'productOption/list/add' => array(
+					'en_US' => '',
+					'fr_FR' => '
+<h4>Ajout d\'une option</h4>
+<p>Les options peuvent être globales (à un bon de commande) ou associée à un produit particulier.</p>
+					',
+			),
+	),
 );

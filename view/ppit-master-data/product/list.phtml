@@ -20,6 +20,11 @@
 				<span class="glyphicon glyphicon-triangle-<?php echo ($dir == 'ASC') ? 'top' : 'bottom' ?>"></span>
 	<?php endif ?>
 			</button>
+	<?php if ($context->isDemoModeActive()) : ?>
+			<a class="tip" href="#" title="<?php echo $context->getConfig('demo')['product/list/ordering'][$context->getLocale()] ?>">
+			    <img src="<?php echo $this->basePath('img/tip.png') ?>" width="20" />
+			</a>
+	<?php endif;?>
 		</th>
 
 		<th align="center">
@@ -49,15 +54,25 @@
 			<button type="button" class="btn btn-default index-btn product-detail-anchor" title="<?php echo $this->translate('Detail', 'ppit-core', $context->getLocale())?>" id="product-detail-anchor_0">
 				<span class="glyphicon glyphicon-plus" id="add-glyphicon"></span>
 			</button>
+<?php if ($context->isDemoModeActive()) : ?>
+			<a class="tip" href="#" title="<?php echo $context->getConfig('demo')['product/list/add'][$context->getLocale()] ?>">
+			    <img src="<?php echo $this->basePath('img/tip.png') ?>" width="20" />
+			</a>
+<?php endif;?>
 		</td>
-		<td>
+		<td colspan="6">
 			<button type="button" class="btn btn-default index-btn" title="<?php echo $this->translate('Detail', 'ppit-core', $context->getLocale())?>" id="option-anchor">
 				<?php echo $this->translate('Global options', 'ppit-master-data', $context->getLocale()) ?>
 			</button>
+<?php if ($context->isDemoModeActive()) : ?>
+			<a class="tip" href="#" title="<?php echo $context->getConfig('demo')['productOption/list/add'][$context->getLocale()] ?>">
+			    <img src="<?php echo $this->basePath('img/tip.png') ?>" width="20" />
+			</a>
+<?php endif;?>
 		</td>
 	</tr>
 	
-<?php foreach ($products as $product) : ?>
+<?php $i = 0; foreach ($products as $product) : ?>
 	<?php if ($context->isAllowed('product/detail')) : ?>
 	
 	<tr class="product" <?php if (!$product->is_available) echo 'style="font-style: italic"' ?>>
@@ -65,34 +80,39 @@
 			<button type="button" class="btn btn-default index-btn product-detail-anchor" title="<?php echo $this->translate('Detail', 'ppit-core', $context->getLocale())?>" id="product-detail-anchor_<?php echo $product->id ?>">
 				<span class="glyphicon glyphicon-zoom-in" id="<?php echo $product->id ?>-glyphicon"></span>
 			</button>
+		<?php if ($i == 0 && $context->isDemoModeActive()) : ?>
+			<a class="tip" href="#" title="<?php echo $context->getConfig('demo')['product/list/detail'][$context->getLocale()] ?>">
+			    <img src="<?php echo $this->basePath('img/tip.png') ?>" width="20" />
+			</a>
+		<?php endif;?>
 		</td>
 
-<?php if (array_key_exists('brand', $context->getConfig('ppitProduct/list'))) : ?>
+		<?php if (array_key_exists('brand', $context->getConfig('ppitProduct/list'))) : ?>
 		<td><?php echo $product->brand ?></td>
-<?php endif;?>
+		<?php endif;?>
 
 		<td><?php echo $product->reference ?></td>
 		<td><?php echo $product->caption ?></td>
 
-<?php foreach ($context->getConfig('ppitProduct/list') as $propertyId => $params) : ?>
-	<?php $property = $context->getConfig('ppitProduct')['properties'][$propertyId] ?>
+		<?php foreach ($context->getConfig('ppitProduct/list') as $propertyId => $params) : ?>
+			<?php $property = $context->getConfig('ppitProduct')['properties'][$propertyId] ?>
 	
-	<?php if ($property['type'] == 'number') : ?>
+			<?php if ($property['type'] == 'number') : ?>
 		<td style="text-align: right"><?php echo $context->formatFloat($product->properties[$propertyId], 2) ?></td>
 	
-	<?php elseif ($property['type'] == 'date') : ?>
+			<?php elseif ($property['type'] == 'date') : ?>
 		<td><?php echo $context->decodeDate($product->properties[$propertyId]) ?></td>
 	
-	<?php else : ?>
+			<?php else : ?>
 		<td><?php echo $product->properties[$propertyId] ?></td>
 
-	<?php endif;?>
+			<?php endif;?>
 
-<?php endforeach;?>
+		<?php endforeach;?>
 
 	</tr>
 	
 	<?php endif;?>
-<?php endforeach; ?>
+<?php $i++; endforeach; ?>
 
 </table>

@@ -130,6 +130,14 @@ function getProductList(type, params, major, dir) {
 	<?php endif;?>
 			document.getElementById('product-list-panel').innerHTML = xhttp.responseText;
 			
+			$(function () {
+			    $('.tip').tooltip({
+			        content: function () {
+			            return $(this).prop('title');
+			        }
+			    });
+			});
+			
 			// Connect the sort anchors
 			$('.ppit-sort-anchor').each(function () {
 				$(this).click(function () {
@@ -239,6 +247,15 @@ function getProductUpdate(type, id, action) {
 			if (xhttp.status == 200) {
 	<?php endif;?>
 			$('#product-update-panel').html(xhttp.responseText);			
+			
+			$(function () {
+			    $('.tip').tooltip({
+			        content: function () {
+			            return $(this).prop('title');
+			        }
+			    });
+			});
+
 			$('#product-up-submit-button').click(function () { connectProductUpdateForm(type, id, action); });
 			$('#product-submit-button').click(function () { connectProductUpdateForm(type, id, action); });
 			
