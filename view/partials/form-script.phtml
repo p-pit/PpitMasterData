@@ -1,0 +1,82 @@
+<?php
+if (!isset($target)) $target = 'form_action';
+if (!isset($formId)) $formId = 'ppit-form';
+echo $this->partial('/partials/reload-function', array('config' => $context->getConfig()));
+?>
+
+	// Add the per-property checking scripts
+	<?php foreach ($properties as $property => $type) : ?>
+		<?php if ($type != 'file' && $type != 'hidden' && $type != 'checkbox' && $type != 'ckeditor' && $type != 'button') : ?>
+			eval(document.getElementById('check_<?php echo $property ?>_script').innerHTML);
+		<?php endif;?>
+	<?php endforeach;?>
+
+	// Catch the onsubmit event
+	var form = document.getElementById('<?php echo $formId ?>');
+	form.onsubmit = function(event) {
+		event.preventDefault();
+		// Check validity
+		var validity = true;
+
+// Integrity controls
+	<?php foreach ($properties as $property => $type) : ?>
+		<?php if ($type != 'file' && $type != 'hidden' && $type != 'checkbox' && $type != 'ckeditor' && $type != 'button') : ?>
+		if (!check_<?php echo $property ?>()) validity = false;
+		<?php endif;?>
+	<?php endforeach;?>
+
+	<?php if (isset($checkFunction)) : ?>
+// Consistency controls
+		if (validity) {
+			validity = <?php echo $checkFunction ?>();
+		}
+	<?php endif;?>
+	
+		if (validity) {
+		
+			// Create a new FormData object.
+			var formData = new FormData();
+			
+			// Get the properties values
+		<?php foreach ($properties as $property => $type) : ?>
+			<?php if ($type == 'checkbox') : ?>
+			formData.append('<?php echo $property ?>', ((document.getElementById('<?php echo $property ?>').checked) ? "1" : "0"));
+			<?php elseif ($type == 'ckeditor') : ?>
+			formData.append('<?php echo $property ?>', encodeURIComponent(CKEDITOR.instances.<?php echo $property ?>.getData()));
+			<?php elseif ($type == 'file') : ?>
+			var fileSelect = document.getElementById('<?php echo $property ?>');
+			if (fileSelect) {
+				var files = fileSelect.files;
+				for (var i = 0; i < files.length; i++) {
+					var file = files[i];
+					formData.append('<?php echo $property ?>', file, file.name);
+				}
+			}
+			<?php else : ?>
+			formData.append('<?php echo $property ?>', document.getElementById('<?php echo $property ?>').value);
+			<?php endif;?>
+		<?php endforeach;?>
+
+			var xhttp = new XMLHttpRequest();
+			xhttp.open('POST', '<?php echo $formRoute ?>', true);
+			// Set up a handler for when the request finishes.
+			xhttp.onload = function () {
+				if (xhttp.readyState == 4 <?php if (!$context->getConfig()['ppitCoreSettings']['isTraceActive']) echo '&& xhttp.status == 200' ?>) {
+
+		<?php if ($context->getConfig()['ppitCoreSettings']['isTraceActive']) : ?>
+					console.log('post, route = ' + '<?php echo $formRoute ?>');
+					console.log(xhttp.responseText);
+		<?php endif;?>
+					document.getElementById('<?php echo $target ?>').innerHTML = xhttp.responseText;
+					eval(document.getElementById('<?php echo $formScript ?>').innerHTML);
+		<?php if (isset($mainRoute) && isset($mainTarget)) : ?>
+					reload('<?php echo $mainTarget?>', '<?php echo $mainRoute?>', '<?php echo $mainScript ?>', '<?php echo (isset($openForm)) ? $openForm : '' ?>');
+		<?php endif;?>
+				}
+			};
+
+			// Send the Data.
+			xhttp.send(formData);
+		}
+		else return false;
+	};

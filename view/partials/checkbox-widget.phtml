@@ -1,0 +1,7 @@
+<div class="form-group" id="<?php echo $property ?>_group">
+	<label class="col-sm-5 control-label"><?php echo $label ?></label>
+	<div class="col-sm-7">
+		<input type="checkbox" name="<?php echo $property ?>" id="<?php echo $property ?>" class="form-control" value="1"<?php if ($value) echo ' checked="checked"' ?><?php if (isset($isDisabled) && $isDisabled) echo ' disabled ="disabled"' ?>>
+	</div>
+	<div class="col-sm-12"><p class="help-block" id="<?php echo $property ?>_error"></p></div>
+</div>

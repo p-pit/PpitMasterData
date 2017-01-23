@@ -1,0 +1,23 @@
+function reload(target, route, scriptName, formToHide)
+{
+	// Hide the open forms
+	if (formToHide != '') {
+		document.getElementById(formToHide).style.display='none';
+	}
+	// Anchor to the main panel
+	$(location).attr('hash', '#');
+	var xhttp = new XMLHttpRequest();
+	xhttp.onreadystatechange = function() {
+		if (xhttp.readyState == 4 && xhttp.status == 200) {
+			document.getElementById(target).innerHTML = xhttp.responseText;
+<?php if ($config['ppitCoreSettings']['isTraceActive']) : ?>
+			console.log('reload, target= ' + target + ', route = ' + route + ', scriptName = ' + scriptName + ', formToHide = ' + formToHide);
+			console.log(xhttp.responseText);
+<?php endif;?>
+			eval(document.getElementById(scriptName).innerHTML);
+//			$('#image').hide();
+		}
+	}
+	xhttp.open("GET", route, true);
+	xhttp.send();
+}

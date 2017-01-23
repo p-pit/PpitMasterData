@@ -1,0 +1,93 @@
+<?php
+// Retrieve the config and default non-given arguments
+$config = $context->getConfig();
+if (!isset($anchorStyle)) $anchorStyle = 'button';
+if (!isset($disabled)) $disabled = false;
+if (isset($route) && !isset($script)) $script = $route.'-script';
+?>
+
+<!-- Presentation part -->
+<?php if ($anchorStyle == 'button') : ?>
+
+<!-- Case of a button -->
+	<button type="button" class="btn <?php echo isset ($buttonColor) ? $buttonColor : 'btn-default' ?> <?php if (isset($class)) echo $class ?> <?php echo (isset($size)) ? $size : '' ?>" <?php echo (isset($title)) ? ' title="'.$title.'"' : '' ?> id="<?php echo $id ?>" <?php echo ($disabled) ? ' style="color: gray" disabled="disabled"' : '' ?>>
+		<span><?php echo (isset($text)) ? $text : '' ?></span>
+		<span class="glyphicon <?php echo (isset($glyphicon)) ? $glyphicon : '' ?>" id="<?php echo $id ?>-glyphicon"></span>
+	</button>
+
+<?php else : ?>
+
+<!-- Case of an anchor -->
+	<?php if ($disabled) $markup = 'span'; else $markup = 'a'; ?>
+	<?php if (isset($glyphicon)) : ?>
+		<<?php echo $markup?> class="glyphicon <?php echo $glyphicon ?>" title="<?php echo $title ?>" id="<?php echo $id ?>" href="#"></<?php echo $markup?>>
+	<?php else : ?>
+		<<?php echo $markup?> id="<?php echo $id ?>" href="#"><?php echo $text ?></<?php echo $markup?>>
+	<?php endif; ?>
+
+<?php endif; ?>
+
+<!-- Behaviour part -->
+<script id="<?php echo $id ?>-script">
+
+<?php if (!isset($route)) : ?>
+
+	$('#<?php echo $id ?>').click(function () {
+		// Mask the target
+		$('#<?php echo $target ?>').hide();
+
+		<?php if (isset($class)) : ?>
+			// Highlight the clicked button (and only it in its class)
+			$('.<?php echo $class ?>').removeClass("btn-primary").addClass("btn-default");                 
+			$('#<?php echo $id ?>').removeClass("btn-default").addClass("btn-primary");
+		<?php endif;?>
+	});
+
+<?php else : ?>
+
+	<?php if ($anchorStyle == 'button') : ?>
+	
+		<!-- Case of a button -->
+		$('#<?php echo $id ?>').click(function () {
+		
+			// Ensure the target is displayed
+		<?php if (isset($targetClass)) : ?>
+			$('.<?php echo $targetClass ?>').hide();
+		<?php endif;?>
+			$('#<?php echo $target ?>').show();
+
+			// Anchor to the new panel
+			$(location).attr('hash', '<?php echo $target ?>');
+	
+			// Execute the ajax request
+			xhttp = new XMLHttpRequest();
+			xhttp.onreadystatechange = function() {
+				if (xhttp.readyState == 4 && xhttp.status == 200) {
+/*					$('#<?php echo $target ?>').empty().append(xhttp.responseText);
+	                $("#<?php echo $target ?>").find("script").each(function(i) {
+	                    eval($(this).text());
+	                });*/
+					document.getElementById('<?php echo $target ?>').innerHTML = xhttp.responseText;
+					eval(document.getElementById('<?php echo $script ?>').innerHTML);
+				}
+			}
+			xhttp.open("GET", '<?php echo $this->url($route, $params).(isset($getParams) ? $getParams : '') ?>', true);
+			xhttp.send();
+
+			<?php if (isset($class)) : ?>
+				// Highlight the clicked button (and only it in its class)
+				$('.<?php echo $class ?>').removeClass("btn-primary").addClass("btn-default");                 
+				$('#<?php echo $id ?>').removeClass("btn-default").addClass("btn-primary");
+			<?php endif;?>
+	} );
+
+	<?php else : ?>
+
+	<!-- Case of an anchor -->
+		$('#<?php echo $id ?>').attr("href", "<?php echo $this->url($route, $params).(isset($getParams) ? $getParams : '') ?>");
+	
+	<?php endif;?>
+
+<?php endif;?>
+
+</script>

@@ -1,0 +1,37 @@
+<?php
+if (!isset($labelWidth)) $labelWidth=5;
+$elementWidth = 12 - $labelWidth;
+?>
+<div class="form-group" id="<?php echo $property ?>_group">
+	<label class="col-sm-<?php echo $labelWidth ?> control-label"><?php echo $label ?></label>
+	<div class="col-sm-<?php echo $elementWidth ?>">
+		<textarea name="<?php echo $property ?>" id="<?php echo $property ?>" rows="<?php echo $rows ?>" class="form-control"<?php if (isset($isDisabled) && $isDisabled) echo ' disabled ="disabled"' ?>><?php echo $value ?></textarea>
+	</div>
+	<div class="col-sm-12"><p class="help-block" id="<?php echo $property ?>_error"></p></div>
+</div>
+
+<script id="check_<?php echo $property ?>_script">
+
+function check_<?php echo $property ?>() 
+{
+	var validity = true, error;
+	
+<?php if ($isMandatory) : ?>
+	if (document.getElementById("<?php echo $property ?>").value == "") {
+		renderElement("<?php echo $property ?>", "<?php echo $this->translate('Please input a value', 'ppit-core', $context->getLocale()) ?>");
+		validity = false;
+	}
+    else
+<?php endif;?>
+    if (document.getElementById("<?php echo $property ?>").value.length > <?php echo $maxLength ?>) {
+		renderElement("<?php echo $property ?>", "<?php echo $this->translate('The input is too long', 'ppit-core', $context->getLocale()) ?>");
+		validity = false;
+	}
+    else {
+		renderElement("<?php echo $property ?>", null);
+	}
+
+	return validity;
+}
+
+</script>
