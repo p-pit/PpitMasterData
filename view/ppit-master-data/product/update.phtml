@@ -175,7 +175,7 @@ if ($product->id && $action != 'update' || $message == 'OK') $isDisabled = true;
 		<div class="form-group" id="input_product-tax_1_share_group">
 			<label class="col-sm-5 control-label"><?php echo $this->translate('Tax 1 share', 'ppit-master-data', $context->getLocale()) ?> (%)</label>
 			<div class="col-sm-7">
-				<input class="form-control" id="input_product-tax_1_share" value="<?php echo ($product->variants[0]['tax_1_share']) ? $context->formatFloat($product->tax_1_share*100, 2) : '' ?>" <?php if ($isDisabled) echo 'disabled="disabled"'?> />
+				<input class="form-control" id="input_product-tax_1_share" value="<?php echo ($product->tax_1_share) ? $context->formatFloat($product->tax_1_share*100, 2) : '' ?>" <?php if ($isDisabled) echo 'disabled="disabled"'?> />
 			</div>
 			<div class="col-sm-12"><p class="help-block" id="input_product-tax_1_share_error"></p></div>
 		</div>
@@ -184,7 +184,7 @@ if ($product->id && $action != 'update' || $message == 'OK') $isDisabled = true;
 		<div class="form-group" id="input_product-tax_2_share_group">
 			<label class="col-sm-5 control-label"><?php echo $this->translate('Tax 2 share', 'ppit-master-data', $context->getLocale()) ?> (%)</label>
 			<div class="col-sm-7">
-				<input class="form-control" id="input_product-tax_2_share" value="<?php echo ($product->variants[0]['tax_2_share']) ? $context->formatFloat($product->tax_2_share*100, 2) : '' ?>" <?php if ($isDisabled) echo 'disabled="disabled"'?> />
+				<input class="form-control" id="input_product-tax_2_share" value="<?php echo ($product->tax_2_share) ? $context->formatFloat($product->tax_2_share*100, 2) : '' ?>" <?php if ($isDisabled) echo 'disabled="disabled"'?> />
 			</div>
 			<div class="col-sm-12"><p class="help-block" id="input_product-tax_2_share_error"></p></div>
 		</div>
@@ -193,7 +193,7 @@ if ($product->id && $action != 'update' || $message == 'OK') $isDisabled = true;
 		<div class="form-group" id="input_product-tax_3_share_group">
 			<label class="col-sm-5 control-label"><?php echo $this->translate('Tax 3 share', 'ppit-master-data', $context->getLocale()) ?> (%)</label>
 			<div class="col-sm-7">
-				<input class="form-control" id="input_product-tax_3_share" value="<?php echo ($product->variants[0]['tax_3_share']) ? $context->formatFloat($product->tax_3_share*100, 2) : '' ?>" <?php if ($isDisabled) echo 'disabled="disabled"'?> />
+				<input class="form-control" id="input_product-tax_3_share" value="<?php echo ($product->tax_3_share) ? $context->formatFloat($product->tax_3_share*100, 2) : '' ?>" <?php if ($isDisabled) echo 'disabled="disabled"'?> />
 			</div>
 			<div class="col-sm-12"><p class="help-block" id="input_product-tax_3_share_error"></p></div>
 		</div>
