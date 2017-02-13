@@ -77,8 +77,8 @@ function eraseProductSearch(type) {
 function sortProductList(type, criterion) {
 
 	var dir;
-	ascCriterion = $('.glyphicon-triangle-top').first().parent().attr('id');
-	descCriterion = $('.glyphicon-triangle-bottom').first().parent().attr('id');
+	ascCriterion = $('.product-top').first().parent().attr('id');
+	descCriterion = $('.product-bottom').first().parent().attr('id');
 	if (criterion + '-anchor' == ascCriterion) dir = 'DESC'; else dir = 'ASC';
 	getProductList(type, getParams(type), criterion, dir);
 }
@@ -139,7 +139,7 @@ function getProductList(type, params, major, dir) {
 			});
 			
 			// Connect the sort anchors
-			$('.ppit-sort-anchor').each(function () {
+			$('.product-sort-anchor').each(function () {
 				$(this).click(function () {
 					sortProductList(type, $(this).attr('id').split('-')[0]);
 				});

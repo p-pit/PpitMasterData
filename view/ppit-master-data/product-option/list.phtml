@@ -2,18 +2,18 @@
 			<tr>
 				<th>&nbsp;</th>
 				<th align="center">
-					<button type="button" class="btn btn-default btn-xs ppit-sort-anchor" id="reference-anchor">
+					<button type="button" class="btn btn-default btn-xs option-sort-anchor" id="option-reference-anchor">
 						<span><?php echo $this->translate('Reference', 'ppit-master-data', $context->getLocale()) ?></span>
 <?php if ($major == 'reference') : ?>
-						<span class="glyphicon glyphicon-triangle-<?php echo ($dir == 'ASC') ? 'top' : 'bottom' ?>"></span>
+						<span class="glyphicon glyphicon-triangle-<?php echo ($dir == 'ASC') ? 'top' : 'bottom' ?> option-<?php echo ($dir == 'ASC') ? 'top' : 'bottom' ?>"></span>
 <?php endif ?>
 					</button>
 				</th>
 				<th align="center">
-					<button type="button" class="btn btn-default btn-xs ppit-sort-anchor" id="caption-anchor">
+					<button type="button" class="btn btn-default btn-xs option-sort-anchor" id="option-caption-anchor">
 						<span><?php echo $this->translate('Caption', 'ppit-core', $context->getLocale()) ?></span>
 <?php if ($major == 'caption') : ?>
-						<span class="glyphicon glyphicon-triangle-<?php echo ($dir == 'ASC') ? 'top' : 'bottom' ?>"></span>
+						<span class="glyphicon glyphicon-triangle-<?php echo ($dir == 'ASC') ? 'top' : 'bottom' ?> option-<?php echo ($dir == 'ASC') ? 'top' : 'bottom' ?>"></span>
 <?php endif ?>
 					</button>
 				</th>

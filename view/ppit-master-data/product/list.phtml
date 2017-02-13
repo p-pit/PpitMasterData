@@ -4,20 +4,20 @@
 
 <?php if (array_key_exists('brand', $context->getConfig('ppitProduct/list'))) : ?>
 		<th align="center">
-			<button type="button" class="btn btn-default btn-xs ppit-sort-anchor" id="brand-anchor">
+			<button type="button" class="btn btn-default btn-xs product-sort-anchor" id="brand-anchor">
 				<span><?php echo $this->translate('Brand', 'ppit-master-data', $context->getLocale()) ?></span>
 	<?php if ($major == 'brand') : ?>
-				<span class="glyphicon glyphicon-triangle-<?php echo ($dir == 'ASC') ? 'top' : 'bottom' ?>"></span>
+				<span class="glyphicon glyphicon-triangle-<?php echo ($dir == 'ASC') ? 'top' : 'bottom' ?> product-<?php echo ($dir == 'ASC') ? 'top' : 'bottom' ?>"></span>
 	<?php endif ?>
 			</button>
 		</th>
 <?php endif;?>
 
 		<th align="center">
-			<button type="button" class="btn btn-default btn-xs ppit-sort-anchor" id="reference-anchor">
+			<button type="button" class="btn btn-default btn-xs product-sort-anchor" id="reference-anchor">
 				<span><?php echo $this->translate('Reference', 'ppit-master-data', $context->getLocale()) ?></span>
 	<?php if ($major == 'reference') : ?>
-				<span class="glyphicon glyphicon-triangle-<?php echo ($dir == 'ASC') ? 'top' : 'bottom' ?>"></span>
+				<span class="glyphicon glyphicon-triangle-<?php echo ($dir == 'ASC') ? 'top' : 'bottom' ?> product-<?php echo ($dir == 'ASC') ? 'top' : 'bottom' ?>"></span>
 	<?php endif ?>
 			</button>
 	<?php if ($context->isDemoModeActive()) : ?>
@@ -28,20 +28,20 @@
 		</th>
 
 		<th align="center">
-			<button type="button" class="btn btn-default btn-xs ppit-sort-anchor" id="caption-anchor">
+			<button type="button" class="btn btn-default btn-xs product-sort-anchor" id="caption-anchor">
 				<span><?php echo $this->translate('Caption', 'ppit-core', $context->getLocale()) ?></span>
 	<?php if ($major == 'caption') : ?>
-				<span class="glyphicon glyphicon-triangle-<?php echo ($dir == 'ASC') ? 'top' : 'bottom' ?>"></span>
+				<span class="glyphicon glyphicon-triangle-<?php echo ($dir == 'ASC') ? 'top' : 'bottom' ?> product-<?php echo ($dir == 'ASC') ? 'top' : 'bottom' ?>"></span>
 	<?php endif ?>
 			</button>
 		</th>
 
 <?php foreach ($context->getConfig('ppitProduct/list') as $propertyId => $property) : ?>
 		<th align="center">
-			<button type="button" class="btn btn-default btn-xs ppit-sort-anchor" id="<?php echo $propertyId ?>-anchor">
+			<button type="button" class="btn btn-default btn-xs product-sort-anchor" id="<?php echo $propertyId ?>-anchor">
 				<span><?php echo $context->getInstance()->specifications['ppitMasterData']['properties'][$propertyId]['labels'][$context->getLocale()] ?></span>
 	<?php if ($major == '<?php echo $propertyId ?>') : ?>
-				<span class="glyphicon glyphicon-triangle-<?php echo ($dir == 'ASC') ? 'top' : 'bottom' ?>"></span>
+				<span class="glyphicon glyphicon-triangle-<?php echo ($dir == 'ASC') ? 'top' : 'bottom' ?> product-<?php echo ($dir == 'ASC') ? 'top' : 'bottom' ?>"></span>
 	<?php endif ?>
 			</button>
 		</th>

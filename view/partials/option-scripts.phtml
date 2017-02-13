@@ -1,10 +1,10 @@
-function sortOptionList(type, product_id, criterion) {
+function sortOptionList(type, product_id, params, criterion) {
 
 	var dir;
-	ascCriterion = $('.glyphicon-triangle-top').first().parent().attr('id');
-	descCriterion = $('.glyphicon-triangle-bottom').first().parent().attr('id');
-	if (criterion + '-anchor' == ascCriterion) dir = 'DESC'; else dir = 'ASC';
-	getOptionList(type, product_id, criterion, dir);
+	ascCriterion = $('.option-top').first().parent().attr('id');
+	descCriterion = $('.option-bottom').first().parent().attr('id');
+	if ('option-' + criterion + '-anchor' == ascCriterion) dir = 'DESC'; else dir = 'ASC';
+	getOptionList(type, product_id, params, criterion, dir);
 }
 
 <?php 
@@ -110,9 +110,9 @@ function getOptionList(type, product_id, params, major, dir) {
 	<?php endif;?>
 			$('#option-list-panel').html(xhttp.responseText);
 			$('.option-update-row').hide();
-			$('.ppit-sort-anchor').each(function () {
+			$('.option-sort-anchor').each(function () {
 				$(this).click(function () {
-					sortOptionList(type, product_id, $(this).attr('id').split('-')[0]);
+					sortOptionList(type, product_id, params, $(this).attr('id').split('-')[1]);
 				});
 			});
 			$('.option-detail-anchor').each(function () {

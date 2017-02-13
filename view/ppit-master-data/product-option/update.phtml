@@ -131,7 +131,7 @@ if ($option->id && $action != 'update' || $message == 'OK') $isDisabled = true; 
 		<div class="form-group" id="input_option-price_0_group">
 			<label class="col-sm-5 control-label">* <?php echo $this->translate('Price', 'ppit-master-data', $context->getLocale()) ?></label>
 			<div class="col-sm-7">
-				<input class="form-control" id="input_option-price_0" value="<?php echo $context->formatFloat($option->variants[0]['price'], 2) ?>" <?php if ($isDisabled) echo 'disabled="disabled"'?> />
+				<input class="form-control" id="input_option-price_0" value="<?php echo ($option->variants[0]['price']) ? $context->formatFloat($option->variants[0]['price'], 2) : '' ?>" <?php if ($isDisabled) echo 'disabled="disabled"'?> />
 			</div>
 			<div class="col-sm-12"><p class="help-block" id="input_option-price_0_error"></p></div>
 		</div>
