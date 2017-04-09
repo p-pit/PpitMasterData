@@ -84,6 +84,8 @@
 			'Site' => 'Site',
 			'Special offers' => 'Promotions',
 			'Surface' => 'Superficie',
+			'Tax exempt' => 'Exonéré',
+			'Tax exempt share' => 'Part exonérée',
 			'Tax 1' => 'TVA standard',
 			'Tax 1 share' => 'Part TVA standard',
 			'Tax 2' => 'TVA intermédiaire',

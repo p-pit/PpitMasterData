@@ -559,10 +559,7 @@ return array(
 	        ),
  		),
 	),
-	'ppitRoles' => array(
-			'PpitMasterData' => array(
-			),
-	),
+
 	'ppitMasterDataDependencies' => array(
 	),
 		
