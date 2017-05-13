@@ -61,9 +61,9 @@ echo $this->partial('/partials/reload-function', array('config' => $context->get
 			xhttp.open('POST', '<?php echo $formRoute ?>', true);
 			// Set up a handler for when the request finishes.
 			xhttp.onload = function () {
-				if (xhttp.readyState == 4 <?php if (!$context->getConfig()['ppitCoreSettings']['isTraceActive']) echo '&& xhttp.status == 200' ?>) {
+				if (xhttp.readyState == 4 <?php if (!$context->getConfig()['isTraceActive']) echo '&& xhttp.status == 200' ?>) {
 
-		<?php if ($context->getConfig()['ppitCoreSettings']['isTraceActive']) : ?>
+		<?php if ($context->getConfig()['isTraceActive']) : ?>
 					console.log('post, route = ' + '<?php echo $formRoute ?>');
 					console.log(xhttp.responseText);
 		<?php endif;?>

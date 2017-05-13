@@ -69,7 +69,7 @@ function getPlaceList(param, input) {
 	xhttp.onreadystatechange = function() {
 		if (xhttp.readyState == 4 && xhttp.status == 200) {
 			document.getElementById('place_list').innerHTML = xhttp.responseText;
-<?php if ($config['ppitCoreSettings']['isTraceActive']) : ?>
+<?php if ($config['isTraceActive']) : ?>
 			console.log('getPlaceList, route = ' + '<?php echo $this->url('place/list') ?>?' + param + '=' + input);
 			console.log(xhttp.responseText);
 <?php endif;?>

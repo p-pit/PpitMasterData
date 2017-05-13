@@ -125,7 +125,7 @@ function getProductList(type, params, major, dir) {
 	xhttp.onreadystatechange = function() {
 		if (xhttp.status == 401) location.href = '<?php echo $this->url('user/expired')?>';
 		if (xhttp.readyState == 4) {
-	<?php if (!$config['ppitCoreSettings']['isTraceActive']) : ?>
+	<?php if (!$config['isTraceActive']) : ?>
 			if (xhttp.status == 200) {
 	<?php endif;?>
 			document.getElementById('product-list-panel').innerHTML = xhttp.responseText;
@@ -156,7 +156,7 @@ function getProductList(type, params, major, dir) {
 			$('#option-anchor').click(function () {
 				getProductDetail(type, 0, 'options');
 			});
-	<?php if (!$config['ppitCoreSettings']['isTraceActive']) : ?>
+	<?php if (!$config['isTraceActive']) : ?>
 			}
 	<?php endif;?>
 		}
@@ -222,7 +222,7 @@ function connectProductUpdateForm(type, id, action)
 		xhttp.open('POST', route, true);
 		// Set up a handler for when the request finishes.
 		xhttp.onload = function () {
-			if (xhttp.readyState == 4 <?php if (!$context->getConfig()['ppitCoreSettings']['isTraceActive']) echo '&& xhttp.status == 200' ?>) {
+			if (xhttp.readyState == 4 <?php if (!$context->getConfig()['isTraceActive']) echo '&& xhttp.status == 200' ?>) {
 				$('#product-update-panel').html(xhttp.responseText);
 				filterProductList(type);
 				$('#remove-anchor').click(function () { $('#product-update-panel').hide(); });
@@ -243,7 +243,7 @@ function getProductUpdate(type, id, action) {
 	xhttp.onreadystatechange = function() {
 		if (xhttp.status == 401) location.href = '<?php echo $this->url('user/expired')?>';
 		if (xhttp.readyState == 4) {
-	<?php if (!$config['ppitCoreSettings']['isTraceActive']) : ?>
+	<?php if (!$config['isTraceActive']) : ?>
 			if (xhttp.status == 200) {
 	<?php endif;?>
 			$('#product-update-panel').html(xhttp.responseText);			
@@ -259,7 +259,7 @@ function getProductUpdate(type, id, action) {
 			$('#product-up-submit-button').click(function () { connectProductUpdateForm(type, id, action); });
 			$('#product-submit-button').click(function () { connectProductUpdateForm(type, id, action); });
 			
-<?php if (!$config['ppitCoreSettings']['isTraceActive']) : ?>
+<?php if (!$config['isTraceActive']) : ?>
 			}
 <?php endif;?>
 		}
@@ -289,7 +289,7 @@ function getProductDetail(type, id, mode) {
 	xhttp.onreadystatechange = function() {
 		if (xhttp.status == 401) location.href = '<?php echo $this->url('user/expired')?>';
 		if (xhttp.readyState == 4) {
-	<?php if (!$config['ppitCoreSettings']['isTraceActive']) : ?>
+	<?php if (!$config['isTraceActive']) : ?>
 			if (xhttp.status == 200) {
 	<?php endif;?>
 			$('#form_panel').html(xhttp.responseText);
@@ -308,7 +308,7 @@ function getProductDetail(type, id, mode) {
 				$('#product-delete-anchor').click(function () { getProductUpdate(type, id, 'delete'); });
 			}
 
-	<?php if (!$config['ppitCoreSettings']['isTraceActive']) : ?>
+	<?php if (!$config['isTraceActive']) : ?>
 			}
 	<?php endif;?>
 		}

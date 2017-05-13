@@ -2,6 +2,8 @@
 namespace PpitMasterData;
 
 use PpitCore\Model\GenericTable;
+use PpitMasterData\Model\Agent;
+use PpitMasterData\Model\AgentAttachment;
 use PpitMasterData\Model\OrgUnit;
 use PpitMasterData\Model\OrgUnitContact;
 use PpitMasterData\Model\Product;
@@ -41,6 +43,28 @@ class Module //implements AutoloaderProviderInterface, ConfigProviderInterface
     {
         return array(
             'factories' => array(
+ 	          	'PpitMasterData\Model\AgentTable' =>  function($sm) {
+                    $tableGateway = $sm->get('AgentTableGateway');
+                    $table = new GenericTable($tableGateway);
+                    return $table;
+                },
+                'AgentTableGateway' => function ($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    $resultSetPrototype = new ResultSet();
+                    $resultSetPrototype->setArrayObjectPrototype(new Agent());
+                    return new TableGateway('md_agent', $dbAdapter, null, $resultSetPrototype);
+                },
+ 	          	'PpitMasterData\Model\AgentAttachentTable' =>  function($sm) {
+                    $tableGateway = $sm->get('AgentAttachmentTableGateway');
+                    $table = new GenericTable($tableGateway);
+                    return $table;
+                },
+                'AgentAttachmentTableGateway' => function ($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    $resultSetPrototype = new ResultSet();
+                    $resultSetPrototype->setArrayObjectPrototype(new AgentAttachment());
+                    return new TableGateway('md_agent_attachment', $dbAdapter, null, $resultSetPrototype);
+                },
                 'PpitMasterData\Model\OrgUnitTable' => function($sm) {
                     $tableGateway = $sm->get('OrgUnitTableGateway');
                     $table = new GenericTable($tableGateway);

@@ -559,11 +559,23 @@ return array(
 	        ),
  		),
 	),
-	'ppitRoles' => array(
-			'PpitMasterData' => array(
-			),
-	),
+
 	'ppitMasterDataDependencies' => array(
+	),
+
+	'interaction/type/agent' => array(
+			'controller' => '\PpitCore\Model\Agent::controlInteraction',
+			'processor' => '\PpitCore\Model\Agent::processInteraction',
+	),
+	
+	'interaction/type/agentAttachment' => array(
+			'controller' => '\PpitCore\Model\AgentAttachment::controlInteraction',
+			'processor' => '\PpitCore\Model\AgentAttachment::processInteraction',
+	),
+	
+	'interaction/type/organization' => array(
+			'controller' => '\PpitCore\Model\OrgUnit::controlInteraction',
+			'processor' => '\PpitCore\Model\OrgUnit::processInteraction',
 	),
 		
 	'ppitProduct' => array(

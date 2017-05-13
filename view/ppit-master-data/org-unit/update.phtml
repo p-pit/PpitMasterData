@@ -276,7 +276,7 @@ echo $this->partial('/partials/form-button-script', array(
 		xhttp.onreadystatechange = function() {
 			if (xhttp.readyState == 4 && xhttp.status == 200) {
 				document.getElementById('org_unit_contact_list').innerHTML = xhttp.responseText;
-	<?php if ($config['ppitCoreSettings']['isTraceActive']) : ?>
+	<?php if ($config['isTraceActive']) : ?>
 				console.log('getOrgUnitContactList, route = ' + '<?php echo $this->url('orgUnitContact/list', array('org_unit_id' => $orgUnit->id)) ?>');
 				console.log(xhttp.responseText);
 	<?php endif;?>

@@ -4,6 +4,7 @@ namespace PpitMasterData\Controller;
 use PpitCore\Form\CsrfForm;
 use PpitCore\Model\Context;
 use PpitCore\Model\Csrf;
+use PpitCore\Model\Place;
 use PpitCore\Model\Vcard;
 use PpitMasterData\Model\Product;
 use Zend\Mvc\Controller\AbstractActionController;
@@ -18,6 +19,7 @@ class ProductController extends AbstractActionController
     {
     	$context = Context::getCurrent();
 		if (!$context->isAuthenticated()) $this->redirect()->toRoute('home');
+    	$place = Place::getTable()->transGet($context->getPlaceId());
 
 		$type = $this->params()->fromRoute('type', 'p-pit-studies');
 		$types = Context::getCurrent()->getConfig('commitment/types')['modalities'];
@@ -30,6 +32,7 @@ class ProductController extends AbstractActionController
     	return new ViewModel(array(
     			'context' => $context,
     			'config' => $context->getConfig(),
+    			'place' => $place,
 				'type' => $type,
 				'types' => $types,
     			'menu' => $menu,

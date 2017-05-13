@@ -10,7 +10,7 @@ function reload(target, route, scriptName, formToHide)
 	xhttp.onreadystatechange = function() {
 		if (xhttp.readyState == 4 && xhttp.status == 200) {
 			document.getElementById(target).innerHTML = xhttp.responseText;
-<?php if ($config['ppitCoreSettings']['isTraceActive']) : ?>
+<?php if ($config['isTraceActive']) : ?>
 			console.log('reload, target= ' + target + ', route = ' + route + ', scriptName = ' + scriptName + ', formToHide = ' + formToHide);
 			console.log(xhttp.responseText);
 <?php endif;?>

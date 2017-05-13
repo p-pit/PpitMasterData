@@ -82,7 +82,7 @@ function getOrgUnitList(param, input) {
 	xhttp.onreadystatechange = function() {
 		if (xhttp.readyState == 4 && xhttp.status == 200) {
 			document.getElementById('org_unit_list').innerHTML = xhttp.responseText;
-<?php if ($config['ppitCoreSettings']['isTraceActive']) : ?>
+<?php if ($config['isTraceActive']) : ?>
 			console.log('getOrgUnitList, route = ' + '<?php echo $this->url('orgUnit/list') ?>?' + param + '=' + input);
 			console.log(xhttp.responseText);
 <?php endif;?>

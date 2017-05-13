@@ -179,7 +179,7 @@ class OrgUnitContact implements InputFilterAwareInterface
 	{
 		if (!OrgUnitContact::$table) {
 			$sm = Context::getCurrent()->getServiceManager();
-			OrgUnitContact::$table = $sm->get('PpitMasterData\Model\OrgUnitContactTable');
+			OrgUnitContact::$table = $sm->get('PpitCore\Model\OrgUnitContactTable');
 		}
 		return OrgUnitContact::$table;
 	}
