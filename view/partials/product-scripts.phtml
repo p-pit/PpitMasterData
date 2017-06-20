@@ -325,8 +325,6 @@ function activateProduct(type) {
 
 	// Load the search panel and highlight the menu entry
 	loadPanel('search_panel', '<?php echo $this->url('product/search') ?>/' + type);
-	$('.menu-btn').removeClass("btn-primary").addClass("btn-default");
-	$('#product-anchor').removeClass("btn-default").addClass("btn-primary");
 	$('#mode-text').text('<?php echo $this->translate('available', 'ppit-master-data', $context->getLocale())?>');
 	
 	// Connect the search inputs
