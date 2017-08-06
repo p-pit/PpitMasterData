@@ -19,8 +19,8 @@ class ProductController extends AbstractActionController
     {
     	$context = Context::getCurrent();
 		if (!$context->isAuthenticated()) $this->redirect()->toRoute('home');
-    	$place = Place::getTable()->transGet($context->getPlaceId());
-
+    	$place = Place::get($context->getPlaceId());
+		
 		$type = $this->params()->fromRoute('type', 'p-pit-studies');
 		$types = Context::getCurrent()->getConfig('commitment/types')['modalities'];
 		
