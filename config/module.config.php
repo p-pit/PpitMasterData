@@ -460,14 +460,14 @@ return array(
 				array('route' => 'place/delete', 'roles' => array('admin')),*/
 
 				// Product
-				array('route' => 'product', 'roles' => array('user')),
-				array('route' => 'product/index', 'roles' => array('user')),
-				array('route' => 'product/list', 'roles' => array('user')),
+				array('route' => 'product', 'roles' => array('sales_manager')),
+				array('route' => 'product/index', 'roles' => array('sales_manager')),
+				array('route' => 'product/list', 'roles' => array('sales_manager')),
 				array('route' => 'product/criteria', 'roles' => array('guest')),
 				array('route' => 'product/serviceList', 'roles' => array('guest')),
-				array('route' => 'product/search', 'roles' => array('user')),
-				array('route' => 'product/detail', 'roles' => array('user')),
-				array('route' => 'product/update', 'roles' => array('user')),
+				array('route' => 'product/search', 'roles' => array('sales_manager')),
+				array('route' => 'product/detail', 'roles' => array('sales_manager')),
+				array('route' => 'product/update', 'roles' => array('sales_manager')),
 				array('route' => 'product/matrix', 'roles' => array('admin')),
 				array('route' => 'product/delete', 'roles' => array('admin')),
 
@@ -478,11 +478,11 @@ return array(
 				array('route' => 'productCategory/delete', 'roles' => array('admin')),
 				
 				// Product option
-				array('route' => 'productOption', 'roles' => array('user')),
-				array('route' => 'productOption/index', 'roles' => array('user')),
-				array('route' => 'productOption/list', 'roles' => array('user')),
-				array('route' => 'productOption/export', 'roles' => array('user')),
-				array('route' => 'productOption/update', 'roles' => array('user')),
+				array('route' => 'productOption', 'roles' => array('sales_manager')),
+				array('route' => 'productOption/index', 'roles' => array('sales_manager')),
+				array('route' => 'productOption/list', 'roles' => array('sales_manager')),
+				array('route' => 'productOption/export', 'roles' => array('sales_manager')),
+				array('route' => 'productOption/update', 'roles' => array('sales_manager')),
 					
 					
 			)

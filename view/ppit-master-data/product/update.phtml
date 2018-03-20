@@ -164,7 +164,7 @@ if ($product->id && $action != 'update' || $message == 'OK') $isDisabled = true;
 		<input type="hidden" id="product-variant-number" value="1" />
 		<input type="hidden" id="product-price_0" />
 		<div class="form-group" id="input_product-price_0_group">
-			<label class="col-sm-5 control-label">* <?php echo $this->translate('Price', 'ppit-master-data', $context->getLocale()) ?></label>
+			<label class="col-sm-5 control-label"><?php echo $this->translate('Price', 'ppit-master-data', $context->getLocale()) ?></label>
 			<div class="col-sm-7">
 				<input class="form-control" id="input_product-price_0" value="<?php echo ($product->variants[0]['price']) ? $context->formatFloat($product->variants[0]['price'], 2) : '' ?>" <?php if ($isDisabled) echo 'disabled="disabled"'?> />
 			</div>
