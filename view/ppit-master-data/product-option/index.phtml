@@ -221,7 +221,7 @@ $('#submit-group').hide();
 // Product category
 <?php echo $this->partial('/partials/show-main-script', array(
 		'id' => 'product-anchor',
-		'route' => $this->url('product/index', array('product_category_id' => $product->product_category_id)),
+		'route' => $this->url('product/index'),
 		'script' =>'product_script',
 		'hideForm' => true,
 		'spa' => $spa,

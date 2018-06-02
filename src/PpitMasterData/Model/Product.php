@@ -40,13 +40,13 @@ class Product implements InputFilterAwareInterface
     public $update_time;
     
     // Deprecated
-    public $product_category_id;
+//    public $product_category_id;
     public $properties;
     public $criteria;
     public $prices;
     
     // Additional fields
-    public $product_category;
+//    public $product_category;
 
     // Transient properties
     public $optionList;
@@ -100,13 +100,13 @@ class Product implements InputFilterAwareInterface
         $this->update_time = (isset($data['update_time'])) ? $data['update_time'] : array();
 
         // Deprecated
-        $this->product_category_id = (isset($data['product_category_id'])) ? $data['product_category_id'] : null;
+//        $this->product_category_id = (isset($data['product_category_id'])) ? $data['product_category_id'] : null;
         $this->properties = (isset($data['properties'])) ? json_decode($data['properties'], true) : array();
         $this->criteria = (isset($data['criteria'])) ? $data['criteria'] : null;
         $this->prices = (isset($data['prices'])) ? json_decode($data['prices'], true) : array();
         
         // Additional fields
-        $this->product_category = (isset($data['product_category'])) ? $data['product_category'] : null;
+  //      $this->product_category = (isset($data['product_category'])) ? $data['product_category'] : null;
     }
 
     public function toArray()
@@ -137,7 +137,7 @@ class Product implements InputFilterAwareInterface
 	    $data['tax_3_share'] = $this->tax_3_share;
 	     
 	    // Deprecated
-    	$data['product_category_id'] = (int) $this->product_category_id;
+//    	$data['product_category_id'] = (int) $this->product_category_id;
 	    $data['properties'] = json_encode($this->properties);
 	    $data['criteria'] = $this->criteria;
 	    $data['prices'] = json_encode($this->prices);
@@ -213,7 +213,7 @@ class Product implements InputFilterAwareInterface
 		$product->is_available = true;
 		return $product;
     }
-
+/*
     public static function getListForOrder($community_id, $productCategories)
     {
     	$context = Context::getCurrent();
@@ -258,7 +258,7 @@ class Product implements InputFilterAwareInterface
 		}
 
 		return $products;
-    }
+    }*/
 
     public static function get($id, $column = 'id')
     {
